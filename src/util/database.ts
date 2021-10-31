@@ -31,6 +31,7 @@ abstract class BaseDatabase {
                 table = "WUMALookup";
                 identifier = "steamid";
                 break;
+                
             case "sam":
                 target = "rank";
                 table = "sam_players";
@@ -55,6 +56,7 @@ abstract class BaseDatabase {
 
         switch (config.ADMIN_MOD) {
             case "serverguard":
+            case "sam":
             case "ulx":
                 return steam.getSteam2RenderedID();
         }
