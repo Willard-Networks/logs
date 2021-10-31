@@ -72,7 +72,8 @@ abstract class BaseDatabase {
             if (first) {
                 logQuery += ` WHERE ${key}`;
                 first = false;
-            } else {
+            }
+            else {
                 logQuery += ` AND ${key}`;
             }
 
@@ -80,6 +81,10 @@ abstract class BaseDatabase {
 
             switch (key) {
                 case "text":
+                    logQuery += ` LIKE "%${value.replace(/'/g, "")}%"`;
+                    break;
+
+                case "steamid":
                     logQuery += ` LIKE "%${value.replace(/'/g, "")}%"`;
                     break;
 
@@ -100,7 +105,7 @@ abstract class BaseDatabase {
         logQuery += ` ORDER BY id DESC LIMIT ${
             args.limit ? mysql.escape(args.limit).replace(/'/g, "") : 50
         };`;
-
+        console.log(logQuery);
         return logQuery;
     }
 }
