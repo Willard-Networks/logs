@@ -79,7 +79,7 @@ abstract class BaseDatabase {
             const value = mysql.escape(args[key]);
 
             switch (key) {
-                case "string":
+                case "text":
                     logQuery += ` LIKE "%${value.replace(/'/g, "")}%"`;
                     break;
 
@@ -156,20 +156,52 @@ export class MySqlDatabase extends BaseDatabase {
     }
 
     public async getRank(steamid: string): Promise<string | undefined> {
+        try {
         const promisePool = this.pool.promise();
         const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
 
         const [, result] = Object.entries(rows)[0];
 
         return result[this.target];
+        } catch (err) {
+            this.pool = mysql.createPool({
+                user: config.MYSQL_USER,
+                password: config.MYSQL_PASS,
+                host: config.MYSQL_HOST,
+                port: parseInt(config.MYSQL_PORT),
+                database: "sam",
+            });
+        const promisePool = this.pool.promise();
+        const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
+
+        const [, result] = Object.entries(rows)[0];
+
+        return result[this.target];
+        }
     }
 
     public async getLogs(args: Query): Promise<LogEntry[]> {
+        try {
         const promisePool = this.pool.promise();
         const logQuery = this.buildQuery(args);
 
         const [rows] = await promisePool.query(logQuery);
 
         return rows as LogEntry[];
+        } catch (err) {
+            this.pool = mysql.createPool({
+                user: config.MYSQL_USER,
+                password: config.MYSQL_PASS,
+                host: config.MYSQL_HOST,
+                port: parseInt(config.MYSQL_PORT),
+                database: "wnhelix",
+            });
+        const promisePool = this.pool.promise();
+        const logQuery = this.buildQuery(args);
+
+        const [rows] = await promisePool.query(logQuery);
+
+        return rows as LogEntry[];
+        }
     }
 }

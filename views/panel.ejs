@@ -125,7 +125,6 @@
           <col class="log" />
           <col class="time" />
           <col class="steamid" />
-          <col class="itemid" />
           <col class="charid" />
         </colgroup>
         <thead>
@@ -135,7 +134,6 @@
             <th scope="col">Log</th>
             <th scope="col">Time</th>
             <th scope="col">Steam ID</th>
-            <th scope="col">Item ID</th>
             <th scope="col">Character ID</th>
           </tr>
         </thead>
@@ -147,13 +145,13 @@
               <%= log.id %>
             </th>
             <td>
-              <%= log.type %>
+              <%= log.log_type %>
             </td>
             <td>
-              <%= log.string %>
+              <%= log.text %>
             </td>
             <td>
-              <%= timeConverter(log.time) %>
+              <%= timeConverter(log.datetime) %>
             </td>
             <td>
               <% if (log.steamid !== undefined && log.steamid !== null) { %>
@@ -167,10 +165,7 @@
               <% } %>
             </td>
             <td>
-              <%= log.itemid %>
-            </td>
-            <td>
-              <%= log.charid %>
+              <%= log.char_id %>
             </td>
           </tr>
           <% }) %>
