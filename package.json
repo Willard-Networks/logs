@@ -39,7 +39,7 @@
         "express-session": "1.17.1",
         "fs": "0.0.1-security",
         "https": "^1.0.0",
-        "lusca": "1.6.1",
+        "lusca": "1.7.0",
         "mysql2": "^2.2.5",
         "passport": "0.4.1",
         "passport-steam": "^1.0.15",
