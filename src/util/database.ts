@@ -31,6 +31,11 @@ abstract class BaseDatabase {
                 table = "WUMALookup";
                 identifier = "steamid";
                 break;
+            case "sam":
+                target = "rank";
+                table = "sam_players";
+                identifier = "steamid";
+                break;
         }
     
         this._adminQuery = `SELECT ${target} FROM ${table} WHERE ${identifier} = ?;`;
