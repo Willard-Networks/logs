@@ -1,21 +1,17 @@
 # Helix Logs
 A logger for the Helix roleplaying framework written in Node.js with Typescript.
 
-If you enjoyed my project, consider adding a star ⭐ or checking out my server [Aurora HL2RP](https://aurorahl2rp.com), which has used this tool at scale and in production before its release.
-
 ![demo](https://i.imgur.com/bEDbdJe.gif)
 
 # Features
 - Steam login
 - Usergroup whitelist
 - MySQL and SQLite support
-- Serverguard and ULX support
+- SAM, Serverguard and ULX support
 - Search filters
   - Messages
   - Before and after dates
   - Steam ID's
-  - Character ID's
-  - Item ID's
 - HTTP and HTTPS support
 - Mobile friendly
 
@@ -23,12 +19,12 @@ If you enjoyed my project, consider adding a star ⭐ or checking out my server 
 - [Node.js](https://nodejs.org/en/)
 - [Helix](https://github.com/NebulousCloud/helix) updated since May 11th, 2021
 - [SQL Helix Plugin](https://github.com/wildflowericecoffee/helix-plugins/tree/main/logger.lua)
-- An admin addon. Currently only [Serverguard](https://www.gmodstore.com/market/view/serverguard) and [ULX](https://github.com/TeamUlysses/ulx) are supported
+- An admin addon. SAM, ServerGuard and ULX are supported.
 
 # Getting started
 - Clone the repository
 ```
-git clone --depth=1 https://github.com/wildflowericecoffee/helix-logs.git <project_name>
+git clone --depth=1 https://github.com/willardnetworks/logs.git <project_name>
 ```
 - Install dependencies
 ```
@@ -58,9 +54,6 @@ Rename the `.env.example` file to `.env` and fill out the environment variables
 npm run build
 npm start
 ```
-Or, if you're using VS Code, you can use `cmd + shift + b` to run the default build task (which is mapped to `npm run build`), and then you can use the command palette (`cmd + shift + p`) and select `Tasks: Run Task` > `npm: start` to run `npm start` for you.
-
-> **Note on editors!** - TypeScript has great support in [every editor](http://www.typescriptlang.org/index.html#download-links), but this project has been pre-configured for use with [VS Code](https://code.visualstudio.com/).
 
 Finally, navigate to `http://localhost:3000` and you should see the template being served and rendered locally!
 
