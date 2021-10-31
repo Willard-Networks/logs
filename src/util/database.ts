@@ -89,9 +89,9 @@ abstract class BaseDatabase {
                     break;
 
                 case "datetime":
-                    console.log(value);
-                    const timestamp = new Date(value).getTime() / 1000;
-
+                    const new_value = value.replace(/'/g, "");
+                    const timestamp = new Date(new_value).getTime() / 1000;
+                    
                 case "datetime":
                     logQuery += ` < ${timestamp}`;
                     break;
