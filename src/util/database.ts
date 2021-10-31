@@ -103,7 +103,7 @@ abstract class BaseDatabase {
         }
 
         logQuery += ` ORDER BY id DESC LIMIT ${
-            args.limit ? mysql.escape(args.limit).replace(/'/g, "") : 50
+            args.limit ? mysql.escape(args.limit).replace(/'/g, "") : 500
         };`;
         console.log(logQuery);
         return logQuery;
