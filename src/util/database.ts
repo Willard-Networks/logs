@@ -143,6 +143,7 @@ export class MySqlDatabase extends BaseDatabase {
             user: config.MYSQL_USER,
             password: config.MYSQL_PASS,
             host: config.MYSQL_HOST,
+            port: parseInt(config.MYSQL_PORT),
             database: config.MYSQL_DB
         });
     }
