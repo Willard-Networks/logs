@@ -94,10 +94,6 @@ abstract class BaseDatabase {
                 case "after":
                     logQuery += ` > ${timestamp}`;
                     break;
-
-                default:
-                    logQuery += ` = ${value}`;
-                    break;
             }
         }
 
