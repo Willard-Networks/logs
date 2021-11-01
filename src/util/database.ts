@@ -93,7 +93,6 @@ abstract class BaseDatabase {
                     const before_timestamp = new Date(before_value).getTime() / 1000;
                     logQuery = "SELECT * FROM ix_logs";
                     logQuery += ` WHERE datetime < ${before_timestamp}`;
-                    console.log(logQuery)
                     break;  
 
                 case "after":
@@ -101,7 +100,6 @@ abstract class BaseDatabase {
                     const after_timestamp = new Date(after_value).getTime() / 1000;
                     logQuery = "SELECT * FROM ix_logs";
                     logQuery += ` WHERE datetime > ${after_timestamp}`;
-                    console.log(logQuery)
                     break;
             }
         }
