@@ -85,8 +85,9 @@ abstract class BaseDatabase {
                     break;
 
                 case "steamid":
-                    if (new SteamID(value).getSteam2RenderedID()) {
-                        const steamid64 = new SteamID(value).getSteamID64();
+                    const sanitised_steamid = value.replace(/["']/g, "");
+                    if (new SteamID(sanitised_steamid).getSteam2RenderedID()) {
+                        const steamid64 = new SteamID(sanitised_steamid).getSteamID64();
                         logQuery += ` LIKE "${steamid64.replace(/'/g, "")}"`;
                         break;
                     }
