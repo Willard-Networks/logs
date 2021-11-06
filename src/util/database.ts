@@ -98,7 +98,7 @@ abstract class BaseDatabase {
 
                 case "before":
                 case "after":
-                    const before_date = value.replace(/'/g, "")
+                    const before_date = value.replace(/'/g, "");
                     const unix_date = new Date(before_date).getTime() / 1000;
 
                 case "before":
@@ -113,7 +113,6 @@ abstract class BaseDatabase {
 
                 default:
                     logQuery += ` = ${value}`;
-                    console.log(logQuery);
                     break;
             }
         }
