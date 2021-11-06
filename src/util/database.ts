@@ -97,17 +97,23 @@ abstract class BaseDatabase {
                     }
 
                 case "before":
-                    const before_value = value.replace(/'/g, "");
-                    const before_timestamp = new Date(before_value).getTime() / 1000;
+                case "after":
+                    const before_date = value.replace(/'/g, "")
+                    const unix_date = new Date(before_date).getTime() / 1000;
+
+                case "before":
                     logQuery = "SELECT * FROM ix_logs";
-                    logQuery += ` WHERE datetime < ${before_timestamp}`;
+                    logQuery += ` WHERE datetime < ${unix_date}`;
                     break;  
 
                 case "after":
-                    const after_value = value.replace(/'/g, "");
-                    const after_timestamp = new Date(after_value).getTime() / 1000;
                     logQuery = "SELECT * FROM ix_logs";
-                    logQuery += ` WHERE datetime > ${after_timestamp}`;
+                    logQuery += ` WHERE datetime > ${unix_date}`;
+                    break;
+
+                default:
+                    logQuery += ` = ${value}`;
+                    console.log(logQuery);
                     break;
             }
         }
