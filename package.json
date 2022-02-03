@@ -40,7 +40,7 @@
         "fs": "0.0.1-security",
         "https": "^1.0.0",
         "lusca": "1.7.0",
-        "mysql2": "^2.2.5",
+        "mysql2": "^2.3.3",
         "passport": "0.5.2",
         "passport-steam": "^1.0.15",
         "sqlite": "^4.0.23",
