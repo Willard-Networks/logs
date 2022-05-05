@@ -10,13 +10,13 @@ import { open } from "sqlite";
 import * as config from "./secrets";
 
 abstract class BaseDatabase {
-    private _adminQuery: string;
-    private _target: string; 
+    private readonly _adminQuery: string;
+    private readonly _target: string;
 
     abstract getRank(steamid: string): Promise<string | undefined>;
     abstract getLogs(query: Query): Promise<LogEntry[]>;
 
-    constructor() {
+    protected constructor() {
         let target, table, identifier;
 
         switch (config.ADMIN_MOD) {

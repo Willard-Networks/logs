@@ -17,7 +17,7 @@ import * as panelController from "./controllers/panel";
 import * as passportConfig from "./config/passport";
 
 import * as config from "./util/secrets";
-import { MySqlDatabase, SqliteDatabase } from "./util/database";
+import {MySqlDatabase, SqliteDatabase} from "./util/database";
 
 // Create Express server
 const app = express();
@@ -81,8 +81,7 @@ app.get("/auth/steam/return",
     },
     passport.authenticate("steam", { failureRedirect: "/" }),
     async function (req, res) {
-        const rank = await database.getRank(req.user.id);
-        req.session.rank = rank;
+        req.session.rank = await database.getRank(req.user.id);
         res.redirect("/");
     }
 );
