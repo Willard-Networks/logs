@@ -213,7 +213,7 @@ export class MySqlDatabase extends BaseDatabase {
         const [rows] = await promisePool.query(logQuery);
 
         // After logs are fetched, store them in a json file and include userID in the filename.
-        fs.createWriteStream(`./logs/${this.userID}.json`);
+        fs.createWriteStream("./logs/fetched-logs.json").write(JSON.stringify(rows));
 
         return rows as LogEntry[];
         }
