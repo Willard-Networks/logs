@@ -2,6 +2,7 @@ import mysql from "mysql2";
 import sqlite3 from "sqlite3";
 import sqlite from "sqlite";
 import SteamID from "steamid";
+import fs from "fs";
 
 import { LogEntry } from "logs";
 import { Query } from "express-serve-static-core";
@@ -210,6 +211,9 @@ export class MySqlDatabase extends BaseDatabase {
         const logQuery = this.buildQuery(args);
 
         const [rows] = await promisePool.query(logQuery);
+
+        // After logs are fetched, store them in a json file and include userID in the filename.
+        fs.createWriteStream(`./logs/${this.userID}.json`);
 
         return rows as LogEntry[];
         }
