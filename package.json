@@ -64,7 +64,7 @@
         "@types/jest": "26.0.22",
         "@types/jquery": "3.5.5",
         "@types/lodash": "4.14.168",
-        "@types/lusca": "1.6.2",
+        "@types/lusca": "1.7.1",
         "@types/mysql": "^2.15.18",
         "@types/node": "14.14.25",
         "@types/passport": "1.0.7",
