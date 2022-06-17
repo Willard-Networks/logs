@@ -43,7 +43,7 @@
         "mysql2": "^2.3.3",
         "passport": "0.5.2",
         "passport-steam": "^1.0.15",
-        "sqlite": "^4.0.23",
+        "sqlite": "^4.1.1",
         "sqlite3": "^5.0.3",
         "sqlstring-sqlite": "^0.1.1",
         "steamid": "^1.1.3",
