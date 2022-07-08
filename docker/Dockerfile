@@ -8,7 +8,7 @@ RUN apt update
 
 RUN apt-get install sqlite3 libsqlite3-dev -y
 
-RUN npm install --build-from-source --sqlite=/usr/bin sqlite3
+RUN npm install
 
 RUN npm install -g pm2
 
