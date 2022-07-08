@@ -7,4 +7,22 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - WEBSITE_DOMAIN=${WEBSITE_DOMAIN}
+      - PORT=${PORT}
+      - SSL=${SSL}
+      - SSL_CERT=${SSL_CERT}
+      - SSL_KEY=${SSL_KEY}
+      - DATABASE=${DATABASE}
+      - SQLITE_PATH=${SQLITE_PATH}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASS=${MYSQL_PASS}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DB=${MYSQL_DB}
+      - ADMIN_MOD=${ADMIN_MOD}
+      - STEAM_KEY=${STEAM_KEY}
+      - ALLOWED_RANKS=${ALLOWED_RANKS}
     network_mode: "bridge"
