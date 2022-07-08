@@ -20,7 +20,6 @@ export const WEBSITE_DOMAIN = (SSL ? "https://" : "http://") + (PROD ? env.WEBSI
 export const SSL_CERT = env.SSL_CERT;
 export const SSL_KEY = env.SSL_KEY;
 export const DATABASE = env.DATABASE;
-export const SQLITE_PATH = env.SQLITE_PATH;
 export const MYSQL_USER = env.MYSQL_USER;
 export const MYSQL_PASS = env.MYSQL_PASS;
 export const MYSQL_HOST = env.MYSQL_HOST;

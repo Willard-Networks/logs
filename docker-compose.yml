@@ -16,7 +16,6 @@ services:
       - SSL_CERT=${SSL_CERT}
       - SSL_KEY=${SSL_KEY}
       - DATABASE=${DATABASE}
-      - SQLITE_PATH=${SQLITE_PATH}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASS=${MYSQL_PASS}
       - MYSQL_HOST=${MYSQL_HOST}
