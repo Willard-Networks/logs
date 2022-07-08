@@ -1,5 +1,7 @@
 FROM node:current-buster-slim
 
+WORKDIR /logs
+
 COPY . .
 
 RUN npm install
