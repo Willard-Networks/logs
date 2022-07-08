@@ -4,6 +4,6 @@ COPY . .
 
 RUN npm install
 
-RUN npm run build
+RUN npm install -g pm2
 
-CMD ["npm", "run", "start"]
+CMD ["pm2-runtime", "/dist/server.js"]
