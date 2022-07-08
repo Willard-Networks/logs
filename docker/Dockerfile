@@ -8,4 +8,4 @@ RUN npm install
 
 RUN npm install -g pm2
 
-CMD ["pm2-runtime", "/dist/server.js"]
+CMD ["pm2-runtime", "./dist/server.js"]
