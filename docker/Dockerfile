@@ -4,6 +4,8 @@ WORKDIR /logs
 
 COPY . .
 
+RUN apt update
+
 RUN apt-get install sqlite3 libsqlite3-dev
 
 RUN npm install --build-from-source --sqlite=/usr/bin sqlite3
