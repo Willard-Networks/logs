@@ -1,11 +1,8 @@
 import mysql from "mysql2";
-import sqlite3 from "sqlite3";
-import sqlite from "sqlite";
 import SteamID from "steamid";
 
 import { LogEntry } from "logs";
 import { Query } from "express-serve-static-core";
-import { open } from "sqlite";
 
 import * as config from "./secrets";
 
@@ -121,35 +118,6 @@ abstract class BaseDatabase {
             args.limit ? mysql.escape(args.limit).replace(/'/g, "") : 500
         };`;
         return logQuery;
-    }
-}
-
-export class SqliteDatabase extends BaseDatabase {
-    private db: sqlite.Database;
-
-    constructor() {
-        super();
-    }
-
-    public async setup(): Promise<void> {
-        this.db = await open({
-            filename: config.SQLITE_PATH,
-            driver: sqlite3.cached.Database,
-            mode: sqlite3.OPEN_READONLY
-        });
-    }
-
-    public async getRank(steamid: string): Promise<string | undefined> {
-        const result = await this.db.get(this.adminQuery, this.userID(steamid));
-
-        return result[this.target];
-    }
-
-    public async getLogs(args: Query): Promise<LogEntry[]> {
-        const logQuery = this.buildQuery(args);
-        const results = await this.db.all(logQuery);
-
-        return results as LogEntry[];
     }
 }
 
