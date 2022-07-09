@@ -24,4 +24,5 @@ services:
       - ADMIN_MOD=${ADMIN_MOD}
       - STEAM_KEY=${STEAM_KEY}
       - ALLOWED_RANKS=${ALLOWED_RANKS}
+    hostname: logs.willard.local
     network_mode: "bridge"
