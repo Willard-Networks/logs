@@ -3,7 +3,7 @@ services:
   willard-logs:
     container_name: willard-logs
     ports:
-      - "6000:6000"
+      - "3335:3335"
     build:
       context: .
       dockerfile: ./docker/Dockerfile
