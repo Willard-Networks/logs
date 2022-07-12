@@ -14,6 +14,7 @@ A logger for the Helix roleplaying framework written in Node.js with Typescript.
   - Steam ID's
 - HTTP and HTTPS support
 - Mobile friendly
+- Docker support
 
 # Requirements
 - [Node.js](https://nodejs.org/en/)
