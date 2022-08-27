@@ -78,7 +78,7 @@
         "@typescript-eslint/eslint-plugin": "4.33.0",
         "@typescript-eslint/parser": "4.14.2",
         "chai": "4.3.6",
-        "concurrently": "6.0.2",
+        "concurrently": "7.3.0",
         "eslint": "7.19.0",
         "jest": "26.6.3",
         "nodemon": "2.0.19",
