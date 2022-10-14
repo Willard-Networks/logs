@@ -99,7 +99,7 @@ abstract class BaseDatabase {
                 
                 case "before":
                     // Remove the key from the query
-                    logQuery = logQuery.replace(` AND ${key}`, "");
+                    logQuery = logQuery.replace(` = ${value}`, "");
                     logQuery += ` WHERE datetime < ${unix_date}`;
         
                 default:
