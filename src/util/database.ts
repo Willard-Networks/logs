@@ -96,6 +96,9 @@ abstract class BaseDatabase {
                 case "before":
                     const before_date = value.replace(/'/g, "");
                     const unix_date = new Date(before_date).getTime() / 1000;
+                
+                case "before":
+                    console.log(logQuery);
                     logQuery += ` WHERE datetime < ${unix_date}`;
         
                 default:
