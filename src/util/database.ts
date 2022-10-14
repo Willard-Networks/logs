@@ -99,7 +99,7 @@ abstract class BaseDatabase {
                     const unix_date = new Date(before_date).getTime() / 1000;
 
                 case "before" || "after":
-                    logQuery += ` ${key == "before" ? "<" : ">"} ${unix_date}`;
+                    logQuery += ` WHERE datetime ${key == "before" ? "<" : ">"} ${unix_date}`;
                     break;
 
                 default:
