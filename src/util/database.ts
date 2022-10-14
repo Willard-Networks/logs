@@ -177,7 +177,7 @@ export class MySqlDatabase extends BaseDatabase {
                 password: config.MYSQL_PASS,
                 host: config.MYSQL_HOST,
                 port: parseInt(config.MYSQL_PORT),
-                database: "wnhelix",
+                database: config.MYSQL_DB,
             });
         const promisePool = this.pool.promise();
         const logQuery = this.buildQuery(args);
