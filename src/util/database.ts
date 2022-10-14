@@ -102,13 +102,13 @@ abstract class BaseDatabase {
                 case "after":
                     logQuery = "SELECT * FROM ix_logs";
                     if (key == "before" && args["after"]) {
-                        logQuery += ` WHERE time BETWEEN ${unix_date} AND ${args["after"]}`;
+                        logQuery += ` WHERE datetime BETWEEN ${unix_date} AND ${args["after"]}`;
                     }
                     else if (key == "after" && args["before"]) {
-                        logQuery += ` WHERE time BETWEEN ${args["before"]} AND ${unix_date}`;
+                        logQuery += ` WHERE datetime BETWEEN ${args["before"]} AND ${unix_date}`;
                     }
                     else {
-                        logQuery += ` WHERE time ${key == "before" ? "<" : ">"} ${unix_date}`;
+                        logQuery += ` WHERE datetime ${key == "before" ? "<" : ">"} ${unix_date}`;
                     }
                     break;
         
