@@ -99,11 +99,17 @@ abstract class BaseDatabase {
                     const unix_date = new Date(before_date).getTime() / 1000;
         
                 case "before":
-                    logQuery += ` < ${unix_date}`;
-                    break;
-        
                 case "after":
-                    logQuery += ` > ${unix_date}`;
+                    logQuery = "SELECT * FROM ix_logs";
+                    if (key == "before" && args["after"]) {
+                        logQuery += ` WHERE time BETWEEN ${unix_date} AND ${args["after"]}`;
+                    }
+                    else if (key == "after" && args["before"]) {
+                        logQuery += ` WHERE time BETWEEN ${args["before"]} AND ${unix_date}`;
+                    }
+                    else {
+                        logQuery += ` WHERE time ${key == "before" ? "<" : ">"} ${unix_date}`;
+                    }
                     break;
         
                 default:
