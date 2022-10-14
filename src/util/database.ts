@@ -98,7 +98,8 @@ abstract class BaseDatabase {
                     const unix_date = new Date(before_date).getTime() / 1000;
                 
                 case "before":
-                    logQuery = "SELECT * FROM ix_logs";
+                    // Remove the key from the query
+                    logQuery = logQuery.replace(` AND ${key}`, "");
                     logQuery += ` WHERE datetime < ${unix_date}`;
         
                 default:
