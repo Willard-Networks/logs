@@ -95,14 +95,15 @@ abstract class BaseDatabase {
 
                 case "before":
                 case "after":
-                    const timestamp = new Date(value).getTime() / 1000;
+                    const before_date = value.replace(/'/g, "");
+                    const unix_date = new Date(before_date).getTime() / 1000;
         
                 case "before":
-                    logQuery += ` < ${timestamp}`;
+                    logQuery += ` < ${unix_date}`;
                     break;
         
                 case "after":
-                    logQuery += ` > ${timestamp}`;
+                    logQuery += ` > ${unix_date}`;
                     break;
         
                 default:
