@@ -146,7 +146,7 @@ export class MySqlDatabase extends BaseDatabase {
                 password: config.MYSQL_PASS,
                 host: config.MYSQL_HOST,
                 port: parseInt(config.MYSQL_PORT),
-                database: "sam",
+                database: config.MYSQL_SAM_DB,
             });
         const promisePool = this.pool.promise();
         const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));

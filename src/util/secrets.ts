@@ -25,6 +25,7 @@ export const MYSQL_PASS = env.MYSQL_PASS;
 export const MYSQL_HOST = env.MYSQL_HOST;
 export const MYSQL_PORT = env.MYSQL_PORT;
 export const MYSQL_DB = env.MYSQL_DB;
+export const MYSQL_SAM_DB = env.MYSQL_SAM_DB;
 export const ADMIN_MOD = env.ADMIN_MOD;
 export const STEAM_KEY = env.STEAM_KEY;
 export const ALLOWED_RANKS = env.ALLOWED_RANKS.split(";");
