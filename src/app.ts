@@ -17,7 +17,7 @@ import * as panelController from "./controllers/panel";
 import * as passportConfig from "./config/passport";
 
 import * as config from "./util/secrets";
-import { MySqlDatabase, SqliteDatabase } from "./util/database";
+import {MySqlDatabase} from "./util/database";
 
 // Create Express server
 const app = express();
@@ -49,12 +49,12 @@ app.use(
     express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
 );
 
-export let database: MySqlDatabase | SqliteDatabase;
+export let database: MySqlDatabase;
 
 if (config.DATABASE == "mysql") {
     database = new MySqlDatabase();
-} else if (config.DATABASE == "sqlite") {
-    database = new SqliteDatabase();
+} else {
+    throw new Error("Unknown database type: " + config.DATABASE);
 }
 
 (async () => {
@@ -81,8 +81,7 @@ app.get("/auth/steam/return",
     },
     passport.authenticate("steam", { failureRedirect: "/" }),
     async function (req, res) {
-        const rank = await database.getRank(req.user.id);
-        req.session.rank = rank;
+        req.session.rank = await database.getRank(req.user.id);
         res.redirect("/");
     }
 );
