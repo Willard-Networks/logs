@@ -46,6 +46,7 @@ Rename the `.env.example` file to `.env` and fill out the environment variables
 | SSL_CERT, SSL_KEY                                 | The absolute path of your SSL certificate and key if you are using HTTPS. You can create these with openssl.            |
 | DATABASE (mysql)                         	        | What type of database you have.                                                                                        	|
 | MYSQL_USER, MYSQL_PASS,<br>MYSQL_HOST, MYSQL_DB 	| Login credentials for mysql.                                                                                           	|
+| MYSQL_SAM                                       	| The database name for SAM.                                                                                          	  |
 | ADMIN_MOD (serverguard/ulx)                     	| The admin mod your server uses, currently only ULX and Serverguard are supported.                                      	|
 | STEAM_KEY                                       	| Steam API key, get yours at https://steamcommunity.com/dev/apikey.                                                     	|
 | ALLOWED_RANKS                                   	| List of allowed usergroups that can access the server logs, separated by semicolons.                                   	|
