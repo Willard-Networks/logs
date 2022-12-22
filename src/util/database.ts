@@ -148,8 +148,8 @@ export class MySqlDatabase extends BaseDatabase {
         return result[this.target];
         } catch (err) {
             this.pool = mysql.createPool({
-                user: config.MYSQL_USER,
-                password: config.MYSQL_PASS,
+                user: config.MYSQL_SAM_DB_USER,
+                password: config.MYSQL_SAM_DB_PASS,
                 host: config.MYSQL_HOST,
                 port: parseInt(config.MYSQL_PORT),
                 database: config.MYSQL_SAM_DB,
