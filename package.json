@@ -65,7 +65,7 @@
         "@types/jquery": "3.5.14",
         "@types/lodash": "4.14.190",
         "@types/lusca": "1.7.1",
-        "@types/mysql": "^2.15.18",
+        "@types/mysql": "^2.15.21",
         "@types/node": "18.11.12",
         "@types/passport": "1.0.7",
         "@types/passport-steam": "^1.0.1",
