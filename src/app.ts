@@ -66,7 +66,7 @@ if (config.DATABASE == "mysql") {
  */
 app.get("/", homeController.index);
 app.get("/account", passportConfig.ensureAuthenticated, userController.account);
-app.get("/logout", userController.logout);
+app.post("/logout", userController.logout);
 app.get("/panel", passportConfig.ensureAuthenticated, panelController.index);
 
 /**
