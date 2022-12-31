@@ -187,7 +187,7 @@ export class MySqlDatabase extends BaseDatabase {
         const [rows] = await promisePool.query(logQuery);
 
         // Create a log file to store the rows and overwrite it every time
-        fs.writeFileSync("fetched-logs.json", beautify(rows, null, 2, 100), "utf8");
+        fs.writeFileSync("fetched-logs.json", beautify([rows], null, 2, 100));
 
         // Delete the log file after 2 minutes
         setTimeout(() => {
