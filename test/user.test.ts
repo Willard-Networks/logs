@@ -22,9 +22,9 @@ describe("GET /account", () => {
     });
 });
 
-describe("POST /logout", () => {
+describe("GET /logout", () => {
     it("should return 302 Found for redirection", () => {
-        return request(app).post("/logout")
+        return request(app).get("/logout")
             .expect(302);
     });
 });
