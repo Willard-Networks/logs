@@ -1,7 +1,5 @@
 import mysql from "mysql2";
 import SteamID from "steamid";
-import fs from "fs";
-import beautify from "json-beautify";
 
 import { LogEntry } from "logs";
 import { Query } from "express-serve-static-core";
@@ -185,16 +183,6 @@ export class MySqlDatabase extends BaseDatabase {
         const logQuery = this.buildQuery(args);
 
         const [rows] = await promisePool.query(logQuery);
-
-        // Create a log file to store the rows and overwrite it every time
-        fs.writeFileSync("fetched-logs.json", beautify([rows], null, 2, 100));
-
-        // Delete the log file after 2 minutes
-        setTimeout(() => {
-            fs.unlink("fetched-logs.json", (err) => {
-                if (err) throw err;
-            });
-        }, 120000);
 
         return rows as LogEntry[];
         }

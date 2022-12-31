@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import fs from "fs";
+import beautify from "json-beautify";
 
 import { LogEntry } from "../types/logs";
 
@@ -53,6 +55,15 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
     }
 
     const logs: LogEntry[] = await database.getLogs(req.query);
+
+    // Write logs to file
+    fs.writeFile("fetched-logs.json", beautify(logs, null, 2, 100), (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Error writing logs to file");
+            return;
+        }
+    });
 
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Content-Disposition", "attachment; filename=fetched-logs.json");
