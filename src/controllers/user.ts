@@ -16,10 +16,8 @@ export const account = (req: Request, res: Response): void => {
  * @route GET /logout
  */
 export const logout = (req: Request, res: Response, next: (arg0: never) => unknown): void => {
-    req.logout(function (err: unknown) {
-        if (err) {
-            return next(err);
-        }
-        res.redirect("/");
+    req.logout(function (err: never) {
+        return next(err);
     });
+    res.redirect("/");
 };
