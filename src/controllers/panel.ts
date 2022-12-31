@@ -35,3 +35,26 @@ export const index = async (req: Request, res: Response): Promise<void> => {
     });
 };
 
+// Download fetched logs json
+export const downloadLogs = async (req: Request, res: Response): Promise<void> => {
+    const rank = await database.getRank(req.user.id);
+
+    if (!rank) {
+        res.status(403).send("You need to join the server first!");
+        return;
+    }
+
+    if (!config.ALLOWED_RANKS.includes(rank)) {
+        res.status(403).send(
+            `Your rank (${rank}) is not allowed to see this page.
+            The allowed ranks are: ${config.ALLOWED_RANKS.join(", ")}.`
+        );
+        return;
+    }
+
+    const logs: LogEntry[] = await database.getLogs(req.query);
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Content-Disposition", "attachment; filename=fetched-logs.json");
+    res.send(JSON.stringify(logs));
+};
