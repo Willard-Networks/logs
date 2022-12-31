@@ -57,15 +57,13 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
     const logs: LogEntry[] = await database.getLogs(req.query);
 
     // Write logs to file
-    fs.writeFile("fetched-logs.json", beautify(logs, null, 2, 100), (err) => {
+    fs.writeFile("fetched-logs.json", JSON.stringify(logs), (err) => {
         if (err) {
-            console.error(err);
-            res.status(500).send("Error writing logs to file");
-            return;
+            console.log(err);
         }
     });
 
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Content-Disposition", "attachment; filename=fetched-logs.json");
-    res.send(JSON.stringify(logs));
+    res.send(beautify(logs, null, 2, 100));
 };
