@@ -15,7 +15,11 @@ export const account = (req: Request, res: Response): void => {
  * Logs out steam account.
  * @route GET /logout
  */
-export const logout = (req: Request, res: Response): void => {
-    req.logOut();
-    res.redirect("/");
+export const logout = (req: Request, res: Response, next: (arg0: never) => unknown): void => {
+    req.logout(function (err: unknown) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect("/");
+    });
 };
