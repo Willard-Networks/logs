@@ -68,6 +68,7 @@ app.get("/", homeController.index);
 app.get("/account", passportConfig.ensureAuthenticated, userController.account);
 app.get("/logout", userController.logout);
 app.get("/panel", passportConfig.ensureAuthenticated, panelController.index);
+app.get("/download-logs", passportConfig.ensureAuthenticated, panelController.downloadLogs);
 
 /**
  * Steam sign in.
