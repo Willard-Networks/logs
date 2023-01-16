@@ -27,6 +27,14 @@
 
           return `${month} ${date}, ${year} ${hour}:${min}:${sec} ${isAfternoon ? 'PM' : 'AM'}`
       }
+      function copyToClipboard(text) {
+        var dummy = document.createElement("textarea");
+        document.body.appendChild(dummy);
+        dummy.value = text;
+        dummy.select();
+        document.execCommand("copy");
+        document.body.removeChild(dummy);
+      }
     %>
 
     <form id="logForm" action="#" method="GET">
@@ -99,6 +107,7 @@
             </td>
             <td>
               <%= log.text %>
+              <button class="btn btn-primary" onclick="copyToClipboard('<%= log.text %>')">Copy <i class="fa-solid fa-copy"></i></button>
             </td>
             <td>
               <%= timeConverter(log.datetime) %>
