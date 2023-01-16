@@ -1,9 +1,9 @@
-version: "3.8"
+version: "3.3"
 services:
   willard-logs:
-    container_name: willard-logs
+    container_name: willard-ss-logs
     ports:
-      - "3335:3335"
+      - "3336:3336"
     build:
       context: .
       dockerfile: ./docker/Dockerfile
@@ -24,10 +24,10 @@ services:
       - ADMIN_MOD=${ADMIN_MOD}
       - STEAM_KEY=${STEAM_KEY}
       - ALLOWED_RANKS=${ALLOWED_RANKS}
-    hostname: logs.willard.local
+    hostname: sslogs.willard.local
     network_mode: "bridge"
     healthcheck:
-      test: ["CMD", "curl", "http://logs.willard.local:3335"]
+      test: ["CMD", "curl", "http://sslogs.willard.local:3336"]
       interval: 60s
       timeout: 10s
       retries: 3
