@@ -145,7 +145,7 @@ export class MySqlDatabase extends BaseDatabase {
 
         const [, result] = Object.entries(rows)[0];
 
-        return result[this.target];
+        return result[this.target as keyof typeof result];
         } catch (err) {
             this.pool = mysql.createPool({
                 user: config.MYSQL_USER,
@@ -159,7 +159,7 @@ export class MySqlDatabase extends BaseDatabase {
 
         const [, result] = Object.entries(rows)[0];
 
-        return result[this.target];
+        return result[this.target as keyof typeof result];
         }
     }
 
