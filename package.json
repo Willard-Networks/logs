@@ -27,7 +27,7 @@
         "watch": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run watch-node\""
     },
     "dependencies": {
-        "async": "3.2.2",
+        "async": "3.2.4",
         "body-parser": "1.20.1",
         "compression": "1.7.4",
         "cookie-session": "^2.0.0",
@@ -51,7 +51,7 @@
         "winston": "3.8.2"
     },
     "devDependencies": {
-        "@types/async": "3.2.5",
+        "@types/async": "3.2.16",
         "@types/body-parser": "1.19.2",
         "@types/chai": "4.3.4",
         "@types/compression": "1.7.2",
