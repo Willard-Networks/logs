@@ -16,6 +16,7 @@ A logger for the Helix roleplaying framework written in Node.js with Typescript.
 - Mobile friendly
 - Download recent logs
 - Docker support
+- Rate limiting support
 
 # Requirements
 - [Node.js](https://nodejs.org/en/)

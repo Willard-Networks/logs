@@ -1,6 +1,6 @@
 {
     "name": "helix-logs",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "A logger for the Helix roleplaying framework written in Node.js with Typescript.",
     "repository": {
         "type": "git",
