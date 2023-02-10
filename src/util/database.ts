@@ -61,64 +61,56 @@ abstract class BaseDatabase {
 
     public buildQuery(args: Query): string {
         let logQuery = "SELECT * FROM ix_logs";
-        let first = true;
-
+        let whereClause = "";
+        let limitClause = "";
+    
         for (const key in args) {
-            if (key == "limit") continue;
-
-            if (first) {
-                logQuery += ` WHERE ${key}`;
-                first = false;
-            }
-            else {
-                logQuery += ` AND ${key}`;
-            }
-
             const value = mysql.escape(args[key]);
-
+    
             switch (key) {
                 case "text":
-                    logQuery += ` LIKE "%${value.replace(/'/g, "")}%"`;
+                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}text LIKE "%${value.replace(/'/g, "")}%"`;
                     break;
-
+    
                 case "steamid":
-                    const sanitised_steamid = value.replace(/["']/g, "");
-                    if (new SteamID(sanitised_steamid).getSteam2RenderedID() || new SteamID(sanitised_steamid).getSteam2RenderedID(true)) {
-                        const steamid64 = new SteamID(sanitised_steamid).getSteamID64();
-                        logQuery += ` LIKE "${steamid64.replace(/'/g, "")}"`;
-                        break;
+                    const sanitisedSteamID = value.replace(/["']/g, "");
+                    if (new SteamID(sanitisedSteamID).getSteam2RenderedID() || new SteamID(sanitisedSteamID).getSteam2RenderedID(true)) {
+                        const steamID64 = new SteamID(sanitisedSteamID).getSteamID64();
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${steamID64.replace(/'/g, "")}"`;
+                    } else {
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${value.replace(/'/g, "")}"`;
                     }
-                    else {
-                        logQuery += ` LIKE "${value.replace(/'/g, "")}"`;
-                        break;
-                    }
-
-                case "before":
-                case "after":
-                    const before_date = value.replace(/'/g, "");
-                    const unix_date = new Date(before_date).getTime() / 1000;
-
-                case "before":
-                    logQuery = "SELECT * FROM ix_logs";
-                    logQuery += ` WHERE datetime < ${unix_date}`;
-                    break;  
-
-                case "after":
-                    logQuery = "SELECT * FROM ix_logs";
-                    logQuery += ` WHERE datetime > ${unix_date}`;
                     break;
-
+    
+                case "before":
+                    const beforeDate = value.replace(/'/g, "");
+                    const unixDateBefore = new Date(beforeDate).getTime() / 1000;
+                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime < ${unixDateBefore}`;
+                    break;
+    
+                case "after":
+                    const afterDate = value.replace(/'/g, "");
+                    const unixDateAfter = new Date(afterDate).getTime() / 1000;
+                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime > ${unixDateAfter}`;
+                    break;
+    
+                case "limit":
+                    limitClause = ` LIMIT ${value.replace(/'/g, "")}`;
+                    break;
+    
                 default:
-                    logQuery += ` = ${value}`;
+                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}${key} = ${value}`;
                     break;
             }
         }
-
-        logQuery += ` ORDER BY id DESC LIMIT ${
-            args.limit ? mysql.escape(args.limit).replace(/'/g, "") : 5000
-        };`;
+    
+        logQuery += whereClause;
+        logQuery += " ORDER BY id DESC";
+        logQuery += limitClause.length > 0 ? limitClause : " LIMIT 5000";
+        logQuery += ";";
+    
         return logQuery;
-    }
+    }    
 }
 
 export class MySqlDatabase extends BaseDatabase {
