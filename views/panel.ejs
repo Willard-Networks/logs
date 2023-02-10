@@ -104,14 +104,16 @@
               <%= timeConverter(log.datetime) %>
             </td>
             <td>
-              <% if (log.steamid !== undefined && log.steamid !== null) { %>
-              <% if (log.steamid.substring(0, 1)=='9' ) { %>
-              BOT
+              <% if (log.steamid !== undefined && log.steamid !== null && log.steamid !== '') { %>
+              <% if (log.steamid.substring(0, 1) == '9') { %>
+              SERVER
               <% } else { %>
               <a class="text-white" href="https://steamid.io/lookup/<%=log.steamid%>">
                 <%= log.steamid %>
               </a>
               <% } %>
+              <% } else { %>
+                <%= 'SERVER' %>
               <% } %>
             </td>
             <td>
