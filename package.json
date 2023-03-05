@@ -79,7 +79,7 @@
         "@types/supertest": "2.0.12",
         "@types/winston": "2.4.4",
         "@typescript-eslint/eslint-plugin": "^5.54.0",
-        "@typescript-eslint/parser": "^5.53.0",
+        "@typescript-eslint/parser": "^5.54.0",
         "chai": "4.3.7",
         "concurrently": "7.6.0",
         "eslint": "8.35.0",
