@@ -14,7 +14,9 @@ A logger for the Helix roleplaying framework written in Node.js with Typescript.
   - Steam ID's
 - HTTP and HTTPS support
 - Mobile friendly
+- Download recent logs
 - Docker support
+- Rate limiting support
 
 # Requirements
 - [Node.js](https://nodejs.org/en/)
@@ -69,3 +71,6 @@ Type `npm run debug` in your terminal to perform a full build and then server th
 > VS Code lets you easily run npm scripts from the editor
 
 ![i9G14KU 1](https://user-images.githubusercontent.com/36643731/123026088-378b3f00-d3a1-11eb-9dbb-873bf0a7e21e.png)
+
+# Disclaimer
+This is a fork of [Helix Logs](https://github.com/itz-coffee/helix-logs) by [itz-coffee](https://github.com/itz-coffee)
