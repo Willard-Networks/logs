@@ -63,7 +63,7 @@
         "@types/eslint": "8.21.3",
         "@types/estree": "^1.0.0",
         "@types/express": "^4.17.17",
-        "@types/express-session": "^1.17.6",
+        "@types/express-session": "^1.17.7",
         "@types/jest": "26.0.22",
         "@types/jquery": "3.5.16",
         "@types/lodash": "4.14.191",
