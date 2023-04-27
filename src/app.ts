@@ -61,11 +61,13 @@ if (config.DATABASE == "mysql") {
 // Close existing connections if any
 (async () => {
     await database.reset();
+    console.log("Database pool reset");
 })();
 
 // Create a database pool
 (async () => {
     await database.setup();
+    console.log("Database pool created");
 })();
 
 /**
