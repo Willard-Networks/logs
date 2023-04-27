@@ -130,6 +130,13 @@ export class MySqlDatabase extends BaseDatabase {
         });
     }
 
+    // If there are existing connections, close them and create a new pool
+    public async reset(): Promise<void> {
+        if (this.pool) {
+            await this.pool.end();
+        }
+    }
+
     public async getRank(steamid: string): Promise<string | undefined> {
         try {
         const promisePool = this.pool.promise();

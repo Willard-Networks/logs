@@ -58,6 +58,12 @@ if (config.DATABASE == "mysql") {
     throw new Error("Unknown database type: " + config.DATABASE);
 }
 
+// Close existing connections if any
+(async () => {
+    await database.reset();
+})();
+
+// Create a database pool
 (async () => {
     await database.setup();
 })();
