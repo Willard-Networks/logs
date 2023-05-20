@@ -118,9 +118,12 @@ export class MySqlDatabase extends BaseDatabase {
 
     constructor() {
         super();
+        this.setup().catch(error => {
+            console.error("Error setting up connection pool: ", error);
+        });
     }
 
-    public async setup(): Promise<void> {
+    private async setup(): Promise<void> {
         this.pool = mysql.createPool({
             user: config.MYSQL_USER,
             password: config.MYSQL_PASS,
@@ -132,51 +135,35 @@ export class MySqlDatabase extends BaseDatabase {
 
     public async getRank(steamid: string): Promise<string | undefined> {
         try {
-        const promisePool = this.pool.promise();
-        const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
-
-        const [, result] = Object.entries(rows)[0];
-
-        return result[this.target as keyof typeof result];
+            const promisePool = this.pool.promise();
+            const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
+            const [, result] = Object.entries(rows)[0];
+            return result[this.target as keyof typeof result];
         } catch (err) {
-            this.pool = mysql.createPool({
-                user: config.MYSQL_USER,
-                password: config.MYSQL_PASS,
-                host: config.MYSQL_HOST,
-                port: parseInt(config.MYSQL_PORT),
-                database: config.MYSQL_SAM_DB,
-            });
-        const promisePool = this.pool.promise();
-        const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
-
-        const [, result] = Object.entries(rows)[0];
-
-        return result[this.target as keyof typeof result];
+            console.error("Error executing query, closing pool and creating a new one", err);
+            await this.pool.end();
+            this.setup(); // Create a new connection pool
+            const promisePool = this.pool.promise();
+            const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
+            const [, result] = Object.entries(rows)[0];
+            return result[this.target as keyof typeof result];
         }
     }
-
+    
     public async getLogs(args: Query): Promise<LogEntry[]> {
         try {
-        const promisePool = this.pool.promise();
-        const logQuery = this.buildQuery(args);
-
-        const [rows] = await promisePool.query(logQuery);
-
-        return rows as LogEntry[];
+            const promisePool = this.pool.promise();
+            const logQuery = this.buildQuery(args);
+            const [rows] = await promisePool.query(logQuery);
+            return rows as LogEntry[];
         } catch (err) {
-            this.pool = mysql.createPool({
-                user: config.MYSQL_USER,
-                password: config.MYSQL_PASS,
-                host: config.MYSQL_HOST,
-                port: parseInt(config.MYSQL_PORT),
-                database: config.MYSQL_DB,
-            });
-        const promisePool = this.pool.promise();
-        const logQuery = this.buildQuery(args);
-
-        const [rows] = await promisePool.query(logQuery);
-
-        return rows as LogEntry[];
+            console.error("Error executing query, closing pool and creating a new one", err);
+            await this.pool.end();
+            this.setup(); // Create a new connection pool
+            const promisePool = this.pool.promise();
+            const logQuery = this.buildQuery(args);
+            const [rows] = await promisePool.query(logQuery);
+            return rows as LogEntry[];
         }
-    }
+    }    
 }
