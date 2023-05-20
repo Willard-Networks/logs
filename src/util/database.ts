@@ -12,6 +12,7 @@ abstract class BaseDatabase {
 
     abstract getRank(steamid: string): Promise<string | undefined>;
     abstract getLogs(query: Query): Promise<LogEntry[]>;
+    abstract getLogsForSteamIDInDateRange(steamid: string, date: string, range: number): Promise<LogEntry[]>;
 
     protected constructor() {
         let target, table, identifier;
@@ -187,4 +188,27 @@ export class MySqlDatabase extends BaseDatabase {
             return rows as LogEntry[];
         }
     }
+
+    public async getLogsForSteamIDInDateRange(steamid: string, date: string, range: number): Promise<LogEntry[]> {
+        try {
+            const promisePool = this.pool.promise();
+            const fromDate = `DATE_SUB(${date}, INTERVAL ${range} DAY)`;
+            const toDate = `DATE_ADD(${date}, INTERVAL ${range} DAY)`;
+            const logQuery = `SELECT * FROM ix_logs WHERE steamid = ? AND datetime BETWEEN ${fromDate} AND ${toDate} ORDER BY id DESC LIMIT 5000;`;
+            const [rows] = await promisePool.query(logQuery, this.userID(steamid));
+            return rows as LogEntry[];
+        } catch (err) {
+            console.error("Error executing query, closing pool and creating a new one", err);
+            await this.pool.end();
+            this.setup().catch(error => {
+                console.error("Error setting up connection pool: ", error);
+            });
+            const promisePool = this.pool.promise();
+            const fromDate = `DATE_SUB(${date}, INTERVAL ${range} DAY)`;
+            const toDate = `DATE_ADD(${date}, INTERVAL ${range} DAY)`;
+            const logQuery = `SELECT * FROM ix_logs WHERE steamid = ? AND datetime BETWEEN ${fromDate} AND ${toDate} ORDER BY id DESC LIMIT 5000;`;
+            const [rows] = await promisePool.query(logQuery, this.userID(steamid));
+            return rows as LogEntry[];
+        }
+    }    
 }

@@ -72,3 +72,12 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
         }
     });
 };
+
+export const getSurroundingLogs = async (req: Request, res: Response): Promise<void> => {
+    const steamId = req.query.steamid as string;
+    const date = req.query.date as string;
+    
+    const logs: LogEntry[] = await database.getLogsForSteamIDInDateRange(steamId, date, 5);
+
+    res.json(logs);
+};

@@ -119,6 +119,9 @@
             <td>
               <%= log.char_id %>
             </td>
+            <td>
+              <button class="context-btn" data-steamid="<%= log.steamid %>" data-date="<%= log.datetime %>">Get Context</button>
+            </td>
           </tr>
           <% }) %>
         </tbody>
@@ -131,26 +134,34 @@
     $(document).ready(function () {
       $('#logTable').dataTable({
         "order": [[0, "desc"]]
-      })
-    })
-
-    $(document).ready(function () {
+      });
+    
       $("form").submit(function () {
         $("input").each(function (index, obj) {
           if ($(obj).val() == "") {
             $(obj).remove()
           }
         })
-      })
-
+      });
+    
       $("#datetime1").focus(function () {
         $(this).attr({ type: 'datetime-local' })
       });
-
+    
       $("#datetime2").focus(function () {
         $(this).attr({ type: 'datetime-local' })
-      })
-    })
+      });
+    
+      $('.context-btn').click(function() {
+        const steamId = $(this).data('steamid');
+        const date = $(this).data('date');
+    
+        $.get('/get-surrounding-logs', { steamid: steamId, date: date }, function(logs) {
+          // Display the logs however you want. This is just a simple example.
+          console.log(logs);
+        });
+      });
+    });      
   </script>
 </body>
 
