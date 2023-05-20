@@ -53,14 +53,10 @@ app.use(
 export let database: MySqlDatabase;
 
 if (config.DATABASE == "mysql") {
-    database = new MySqlDatabase();
+    database = new MySqlDatabase();  // setup() gets called automatically
 } else {
     throw new Error("Unknown database type: " + config.DATABASE);
 }
-
-(async () => {
-    await database.setup();
-})();
 
 /**
  * Rate limiters to prevent brute force attacks.

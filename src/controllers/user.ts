@@ -16,7 +16,7 @@ export const account = (req: Request, res: Response): void => {
  * @route GET /logout
  */
 export const logout = (req: Request, res: Response): void => {
-    req.logOut(function (err) {
+    req.logOut(function (err: unknown) {
         if (err) {
             console.log(err);
         }
