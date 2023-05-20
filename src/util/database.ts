@@ -176,7 +176,9 @@ export class MySqlDatabase extends BaseDatabase {
         } catch (err) {
             console.error("Error executing query, closing pool and creating a new one", err);
             await this.pool.end();
-            this.setup(); // Create a new connection pool
+            this.setup().catch(error => {
+                console.error("Error setting up connection pool: ", error);
+            });
             const promisePool = this.pool.promise();
             const logQuery = this.buildQuery(args);
             const [rows] = await promisePool.query(logQuery);
