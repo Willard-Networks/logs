@@ -42,7 +42,7 @@
         "https": "^1.0.0",
         "json-beautify": "^1.1.1",
         "lusca": "1.7.0",
-        "mysql2": "^3.2.0",
+        "mysql2": "^3.3.1",
         "passport": "github:joeyguerra/passport#missing-regenerate-on-req",
         "passport-steam": "^1.0.17",
         "sqlite": "^4.2.0",
