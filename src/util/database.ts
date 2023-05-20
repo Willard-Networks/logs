@@ -150,7 +150,8 @@ export class MySqlDatabase extends BaseDatabase {
             return result[this.target as keyof typeof result];
         } catch (err) {
             console.error("Error executing query, closing samPool and creating a new one", err);
-    
+            await this.samPool.end();
+
             // Recreate the samPool
             this.samPool = mysql.createPool({
                 user: config.MYSQL_USER,
@@ -176,6 +177,7 @@ export class MySqlDatabase extends BaseDatabase {
         } catch (err) {
             console.error("Error executing query, closing pool and creating a new one", err);
             await this.pool.end();
+            
             this.setup().catch(error => {
                 console.error("Error setting up connection pool: ", error);
             });
