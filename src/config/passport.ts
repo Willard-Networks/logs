@@ -13,7 +13,7 @@ passport.serializeUser((user, done): void => {
     done(null, user);
 });
 
-passport.deserializeUser((obj, done): void => {
+passport.deserializeUser((obj: boolean | Express.User, done: (arg0: null, arg1: unknown) => void): void => {
     done(null, obj);
 });
 
