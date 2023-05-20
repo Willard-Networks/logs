@@ -115,6 +115,7 @@ abstract class BaseDatabase {
 
 export class MySqlDatabase extends BaseDatabase {
     private pool: mysql.Pool;
+    private samPool: mysql.Pool;
 
     constructor() {
         super();
@@ -131,24 +132,40 @@ export class MySqlDatabase extends BaseDatabase {
             port: parseInt(config.MYSQL_PORT),
             database: config.MYSQL_DB
         });
+
+        this.samPool = mysql.createPool({  // setup second pool
+            user: config.MYSQL_USER,
+            password: config.MYSQL_PASS,
+            host: config.MYSQL_HOST,
+            port: parseInt(config.MYSQL_PORT),
+            database: config.MYSQL_SAM_DB  // using the SAM DB
+        });
     }
 
     public async getRank(steamid: string): Promise<string | undefined> {
         try {
-            const promisePool = this.pool.promise();
+            const promisePool = this.samPool.promise();  // use samPool instead of pool
             const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
             const [, result] = Object.entries(rows)[0];
             return result[this.target as keyof typeof result];
         } catch (err) {
-            console.error("Error executing query, closing pool and creating a new one", err);
-            await this.pool.end();
-            this.setup(); // Create a new connection pool
-            const promisePool = this.pool.promise();
+            console.error("Error executing query, closing samPool and creating a new one", err);
+    
+            // Recreate the samPool
+            this.samPool = mysql.createPool({
+                user: config.MYSQL_USER,
+                password: config.MYSQL_PASS,
+                host: config.MYSQL_HOST,
+                port: parseInt(config.MYSQL_PORT),
+                database: config.MYSQL_SAM_DB,
+            });
+    
+            const promisePool = this.samPool.promise();
             const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
             const [, result] = Object.entries(rows)[0];
             return result[this.target as keyof typeof result];
         }
-    }
+    }    
     
     public async getLogs(args: Query): Promise<LogEntry[]> {
         try {
