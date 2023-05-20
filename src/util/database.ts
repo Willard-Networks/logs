@@ -166,8 +166,8 @@ export class MySqlDatabase extends BaseDatabase {
             const [, result] = Object.entries(rows)[0];
             return result[this.target as keyof typeof result];
         }
-    }    
-    
+    }
+
     public async getLogs(args: Query): Promise<LogEntry[]> {
         try {
             const promisePool = this.pool.promise();
@@ -186,5 +186,5 @@ export class MySqlDatabase extends BaseDatabase {
             const [rows] = await promisePool.query(logQuery);
             return rows as LogEntry[];
         }
-    }    
+    }
 }
