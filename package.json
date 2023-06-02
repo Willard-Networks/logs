@@ -38,7 +38,7 @@
         "express-rate-limit": "^6.7.0",
         "express-session": "^1.17.3",
         "lusca": "1.7.0",
-        "mysql2": "^3.3.1",
+        "mysql2": "^3.3.3",
         "passport": "github:joeyguerra/passport#missing-regenerate-on-req",
         "passport-steam": "^1.0.17",
         "sqlite": "^4.2.0",
