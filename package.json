@@ -41,7 +41,7 @@
         "mysql2": "^3.3.1",
         "passport": "github:joeyguerra/passport#missing-regenerate-on-req",
         "passport-steam": "^1.0.17",
-        "sqlite": "^4.2.0",
+        "sqlite": "^4.2.1",
         "sqlite3": "^5.1.6",
         "sqlstring-sqlite": "^0.1.1",
         "steamid": "^2.0.0",
