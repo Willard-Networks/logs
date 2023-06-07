@@ -70,7 +70,12 @@ abstract class BaseDatabase {
         let limitClause = "";
     
         for (const key in args) {
-            const value = mysql.escape(args[key]);
+            let value = args[key];
+            // trim leading/trailing whitespace
+            if (typeof value === 'string') {
+                value = value.trim();
+            }
+            value = mysql.escape(value);
     
             switch (key) {
                 case "text":
@@ -116,7 +121,6 @@ abstract class BaseDatabase {
     
         return logQuery;
     }    
-}
 
 export class MySqlDatabase extends BaseDatabase {
     private pool: mysql.Pool;
