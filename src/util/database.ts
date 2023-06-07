@@ -49,13 +49,18 @@ abstract class BaseDatabase {
     }
 
     public userID(input: string): string {
-        const steam = new SteamID(input);
-
-        switch (config.ADMIN_MOD) {
-            case "serverguard":
-            case "sam":
-            case "ulx":
-                return steam.getSteam2RenderedID();
+        try {
+            const trimmedInput = input.trim();
+            const steam = new SteamID(trimmedInput);
+            switch (config.ADMIN_MOD) {
+                case "serverguard":
+                case "sam":
+                case "ulx":
+                    return steam.getSteam2RenderedID();
+            }
+        } catch (error) {
+            console.error(`Invalid SteamID provided: ${input}. Error: ${error}`);
+            throw error;
         }
     }
 
@@ -65,7 +70,12 @@ abstract class BaseDatabase {
         let limitClause = "";
     
         for (const key in args) {
-            const value = mysql.escape(args[key]);
+            let value = args[key];
+            // trim leading/trailing whitespace
+            if (typeof value === 'string') {
+                value = value.trim();
+            }
+            value = mysql.escape(value);
     
             switch (key) {
                 case "text":
@@ -110,7 +120,7 @@ abstract class BaseDatabase {
         logQuery += ";";
     
         return logQuery;
-    }    
+    }
 }
 
 export class MySqlDatabase extends BaseDatabase {
@@ -144,8 +154,9 @@ export class MySqlDatabase extends BaseDatabase {
 
     public async getRank(steamid: string): Promise<string | undefined> {
         try {
-            const promisePool = this.samPool.promise();  // use samPool instead of pool
-            const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
+            const trimmedSteamId = steamid.trim();
+            const promisePool = this.samPool.promise();  
+            const [rows] = await promisePool.query(this.adminQuery, this.userID(trimmedSteamId));
             const [, result] = Object.entries(rows)[0];
             return result[this.target as keyof typeof result];
         } catch (err) {
@@ -162,12 +173,12 @@ export class MySqlDatabase extends BaseDatabase {
             });
     
             const promisePool = this.samPool.promise();
-            const [rows] = await promisePool.query(this.adminQuery, this.userID(steamid));
+            const trimmedSteamId = steamid.trim();
+            const [rows] = await promisePool.query(this.adminQuery, this.userID(trimmedSteamId));
             const [, result] = Object.entries(rows)[0];
             return result[this.target as keyof typeof result];
         }
     }
-
     public async getLogs(args: Query): Promise<LogEntry[]> {
         try {
             const promisePool = this.pool.promise();
