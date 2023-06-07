@@ -120,7 +120,8 @@ abstract class BaseDatabase {
         logQuery += ";";
     
         return logQuery;
-    }    
+    }
+}
 
 export class MySqlDatabase extends BaseDatabase {
     private pool: mysql.Pool;
