@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import fs from "fs";
-import beautify from "json-beautify";
 
 import { LogEntry } from "../types/logs";
 
@@ -37,7 +36,6 @@ export const index = async (req: Request, res: Response): Promise<void> => {
     });
 };
 
-// Download fetched logs json
 export const downloadLogs = async (req: Request, res: Response): Promise<void> => {
     const rank = await database.getRank(req.user.id);
 
@@ -57,13 +55,20 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
     const logs: LogEntry[] = await database.getLogs(req.query);
 
     // Write logs to file
-    fs.writeFile("fetched-logs.json", JSON.stringify(logs), (err: unknown) => {
+    const filePath = "fetched-logs.json";
+    fs.writeFile(filePath, JSON.stringify(logs, null, 2), (err: unknown) => {
         if (err) {
             console.log(err);
+            res.status(500).send("Error writing to file");
+        } else {
+            // Set the headers and send the file
+            res.setHeader("Content-Type", "application/json");
+            res.download(filePath, (err: unknown) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send("Error downloading file");
+                }
+            });
         }
     });
-
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Content-Disposition", "attachment; filename=fetched-logs.json");
-    res.send(beautify(logs, null, 2, 100));
 };
