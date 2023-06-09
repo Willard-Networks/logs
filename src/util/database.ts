@@ -85,11 +85,15 @@ abstract class BaseDatabase {
                 case "steamid":
                     if (value) {
                         const sanitisedSteamID = value.replace(/["']/g, "");
-                        if (new SteamID(sanitisedSteamID).getSteam2RenderedID() || new SteamID(sanitisedSteamID).getSteam2RenderedID(true)) {
-                            const steamID64 = new SteamID(sanitisedSteamID).getSteamID64();
-                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${steamID64.replace(/'/g, "")}"`;
-                        } else {
-                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${value.replace(/'/g, "")}"`;
+                        try {
+                            if (new SteamID(sanitisedSteamID).isValid()) {
+                                const steamID64 = new SteamID(sanitisedSteamID).getSteamID64();
+                                whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${steamID64.replace(/'/g, "")}"`;
+                            } else {
+                                whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${value.replace(/'/g, "")}"`;
+                            }
+                        } catch(err) {
+                            console.error("Invalid Steam ID");
                         }
                     }
                     break;
@@ -123,7 +127,7 @@ abstract class BaseDatabase {
     
         return logQuery;
     }
-}    
+}
 
 export class MySqlDatabase extends BaseDatabase {
     private pool: mysql.Pool;
