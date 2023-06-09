@@ -77,50 +77,52 @@ abstract class BaseDatabase {
             }
             value = mysql.escape(value);
     
-            switch (key) {
-                case "text":
-                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}text LIKE "%${value.replace(/'/g, "")}%"`;
-                    break;
+            if (value !== "''") { // only add to the query if it has a non-empty value
+                switch (key) {
+                    case "text":
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}text LIKE "%${value.replace(/'/g, "")}%"`;
+                        break;
     
-                case "steamid":
-                    if (value) {
-                        const sanitisedSteamID = value.replace(/["']/g, "");
-                        try {
-                            if (new SteamID(sanitisedSteamID).isValid()) {
-                                const steamID64 = new SteamID(sanitisedSteamID).getSteamID64();
-                                whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${steamID64.replace(/'/g, "")}"`;
-                            } else {
-                                whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${value.replace(/'/g, "")}"`;
+                    case "steamid":
+                        if (value) {
+                            const sanitisedSteamID = value.replace(/["']/g, "");
+                            try {
+                                if (new SteamID(sanitisedSteamID).isValid()) {
+                                    const steamID64 = new SteamID(sanitisedSteamID).getSteamID64();
+                                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${steamID64.replace(/'/g, "")}"`;
+                                } else {
+                                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${value.replace(/'/g, "")}"`;
+                                }
+                            } catch(err) {
+                                console.error("Invalid Steam ID");
                             }
-                        } catch(err) {
-                            console.error("Invalid Steam ID");
                         }
-                    }
-                    break;
+                        break;
     
-                case "before":
-                    const beforeDate = value.replace(/'/g, "");
-                    const unixDateBefore = new Date(beforeDate).getTime() / 1000;
-                    if (!isNaN(unixDateBefore)) {
-                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime < ${unixDateBefore}`;
-                    }
-                    break;
+                    case "before":
+                        const beforeDate = value.replace(/'/g, "");
+                        const unixDateBefore = new Date(beforeDate).getTime() / 1000;
+                        if (!isNaN(unixDateBefore)) {
+                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime < ${unixDateBefore}`;
+                        }
+                        break;
     
-                case "after":
-                    const afterDate = value.replace(/'/g, "");
-                    const unixDateAfter = new Date(afterDate).getTime() / 1000;
-                    if (!isNaN(unixDateAfter)) {
-                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime > ${unixDateAfter}`;
-                    }
-                    break;
+                    case "after":
+                        const afterDate = value.replace(/'/g, "");
+                        const unixDateAfter = new Date(afterDate).getTime() / 1000;
+                        if (!isNaN(unixDateAfter)) {
+                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime > ${unixDateAfter}`;
+                        }
+                        break;
     
-                case "limit":
-                    limitClause = ` LIMIT ${value.replace(/'/g, "")}`;
-                    break;
+                    case "limit":
+                        limitClause = ` LIMIT ${value.replace(/'/g, "")}`;
+                        break;
     
-                default:
-                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}${key} = ${value}`;
-                    break;
+                    default:
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}${key} = ${value}`;
+                        break;
+                }
             }
         }
     
