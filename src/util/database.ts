@@ -101,13 +101,17 @@ abstract class BaseDatabase {
                 case "before":
                     const beforeDate = value.replace(/'/g, "");
                     const unixDateBefore = new Date(beforeDate).getTime() / 1000;
-                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime < ${unixDateBefore}`;
+                    if (!isNaN(unixDateBefore)) {
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime < ${unixDateBefore}`;
+                    }
                     break;
     
                 case "after":
                     const afterDate = value.replace(/'/g, "");
                     const unixDateAfter = new Date(afterDate).getTime() / 1000;
-                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime > ${unixDateAfter}`;
+                    if (!isNaN(unixDateAfter)) {
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime > ${unixDateAfter}`;
+                    }
                     break;
     
                 case "limit":
