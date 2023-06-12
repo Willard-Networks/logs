@@ -11,20 +11,20 @@
     "scripts": {
         "build-sass": "sass src/public/css/main.scss dist/public/css/main.css",
         "build-ts": "tsc",
-        "build": "npm run build-sass && npm run build-ts && npm run lint && npm run copy-static-assets",
+        "build": "pnpm run build-sass && pnpm run build-ts && pnpm run lint && pnpm run copy-static-assets",
         "copy-static-assets": "ts-node copyStaticAssets.ts",
-        "debug": "npm run build && npm run watch-debug",
+        "debug": "pnpm run build && pnpm run watch-debug",
         "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix",
         "serve-debug": "nodemon --inspect dist/server.js -e js,ejs",
         "serve": "node dist/server.js",
-        "start": "npm run serve",
+        "start": "pnpm run serve",
         "test": "jest --forceExit --coverage --verbose",
-        "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\"",
+        "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"pnpm run watch-sass\" \"pnpm run watch-ts\" \"pnpm run serve-debug\"",
         "watch-node": "nodemon dist/server.js -e js,ejs",
         "watch-sass": "sass --watch src/public/css/main.scss dist/public/css/main.css",
-        "watch-test": "npm run test -- --watchAll",
+        "watch-test": "pnpm run test -- --watchAll",
         "watch-ts": "tsc -w",
-        "watch": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run watch-node\""
+        "watch": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"pnpm run watch-sass\" \"pnpm run watch-ts\" \"pnpm run watch-node\""
     },
     "dependencies": {
         "body-parser": "1.20.2",
