@@ -102,7 +102,7 @@ app.get("/auth/steam/return",
         } catch (err) {
             // Handle authentication error
             console.error("Steam authentication error:", err);
-            res.redirect("/login"); // Redirect to a login page or show an error message
+            res.redirect("/login");
         }
     }
 );
