@@ -92,10 +92,18 @@ app.get("/auth/steam/return",
         req.url = req.originalUrl;
         next();
     },
-    passport.authenticate("steam", { failureRedirect: "/" }),
     async function (req, res) {
-        req.session.rank = await database.getRank(req.user.id);
-        res.redirect("/");
+        try {
+            await passport.authenticate("steam", { failureRedirect: "/" })(req, res);
+
+            // Handle successful authentication
+            req.session.rank = await database.getRank(req.user.id);
+            res.redirect("/");
+        } catch (err) {
+            // Handle authentication error
+            console.error("Steam authentication error:", err);
+            res.redirect("/login"); // Redirect to a login page or show an error message
+        }
     }
 );
 export default app;
