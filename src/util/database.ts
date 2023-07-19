@@ -1,9 +1,7 @@
 import mysql from "mysql2";
 import SteamID from "steamid";
-
 import { LogEntry } from "logs";
 import { Query } from "express-serve-static-core";
-
 import * as config from "./secrets";
 
 abstract class BaseDatabase {
@@ -28,14 +26,14 @@ abstract class BaseDatabase {
                 table = "WUMALookup";
                 identifier = "steamid";
                 break;
-                
+
             case "sam":
                 target = "rank";
                 table = "sam_players";
                 identifier = "steamid";
                 break;
         }
-    
+
         this._adminQuery = `SELECT ${target} FROM ${table} WHERE ${identifier} = ?;`;
         this._target = target;
     }
@@ -64,74 +62,80 @@ abstract class BaseDatabase {
         }
     }
 
-    public buildQuery(args: Query): string {
+    public buildQuery(args: Query): { query: string; values: (string | number)[] } {
         let logQuery = "SELECT * FROM ix_logs";
         let whereClause = "";
         let limitClause = "";
-    
+        const values: (string | number)[] = [];
+
         for (const key in args) {
-            let value = args[key];
+            let value: any = args[key];
             // trim leading/trailing whitespace
             if (typeof value === "string") {
                 value = value.trim();
             }
-            value = mysql.escape(value);
-    
-            if (value !== "''") { // only add to the query if it has a non-empty value
+            if (value !== "") { // only add to the query if it has a non-empty value
                 switch (key) {
                     case "text":
-                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}text LIKE "%${value.replace(/'/g, "")}%"`;
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}text LIKE ?`;
+                        values.push(`%${value}%`);
                         break;
-    
+
                     case "steamid":
                         if (value) {
                             const sanitisedSteamID = value.replace(/["']/g, "");
                             try {
                                 if (new SteamID(sanitisedSteamID).isValid()) {
                                     const steamID64 = new SteamID(sanitisedSteamID).getSteamID64();
-                                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${steamID64.replace(/'/g, "")}"`;
+                                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE ?`;
+                                    values.push(steamID64);
                                 } else {
-                                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE "${value.replace(/'/g, "")}"`;
+                                    whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}steamid LIKE ?`;
+                                    values.push(value);
                                 }
-                            } catch(err) {
+                            } catch (err) {
                                 console.error("Invalid Steam ID");
                             }
                         }
                         break;
-    
+
                     case "before":
                         const beforeDate = value.replace(/'/g, "");
                         const unixDateBefore = new Date(beforeDate).getTime() / 1000;
                         if (!isNaN(unixDateBefore)) {
-                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime < ${unixDateBefore}`;
+                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime < ?`;
+                            values.push(unixDateBefore);
                         }
                         break;
-    
+
                     case "after":
                         const afterDate = value.replace(/'/g, "");
                         const unixDateAfter = new Date(afterDate).getTime() / 1000;
                         if (!isNaN(unixDateAfter)) {
-                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime > ${unixDateAfter}`;
+                            whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}datetime > ?`;
+                            values.push(unixDateAfter);
                         }
                         break;
-    
+
                     case "limit":
-                        limitClause = ` LIMIT ${value.replace(/'/g, "")}`;
+                        limitClause = " LIMIT ?";
+                        values.push(parseInt(value));
                         break;
-    
+
                     default:
-                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}${key} = ${value}`;
+                        whereClause += `${whereClause.length > 0 ? " AND " : " WHERE "}${key} = ?`;
+                        values.push(value);
                         break;
                 }
             }
         }
-    
+
         logQuery += whereClause;
         logQuery += " ORDER BY id DESC";
         logQuery += limitClause.length > 0 ? limitClause : " LIMIT 5000";
         logQuery += ";";
-    
-        return logQuery;
+
+        return { query: logQuery, values: values };
     }
 }
 
@@ -155,19 +159,19 @@ export class MySqlDatabase extends BaseDatabase {
             database: config.MYSQL_DB
         });
 
-        this.samPool = mysql.createPool({  // setup second pool
+        this.samPool = mysql.createPool({
             user: config.MYSQL_USER,
             password: config.MYSQL_PASS,
             host: config.MYSQL_HOST,
             port: parseInt(config.MYSQL_PORT),
-            database: config.MYSQL_SAM_DB  // using the SAM DB
+            database: config.MYSQL_SAM_DB
         });
     }
 
     public async getRank(steamid: string): Promise<string | undefined> {
         try {
             const trimmedSteamId = steamid.trim();
-            const promisePool = this.samPool.promise();  
+            const promisePool = this.samPool.promise();
             const [rows] = await promisePool.query(this.adminQuery, this.userID(trimmedSteamId));
             const [, result] = Object.entries(rows)[0];
             return result[this.target as keyof typeof result];
@@ -183,7 +187,7 @@ export class MySqlDatabase extends BaseDatabase {
                 port: parseInt(config.MYSQL_PORT),
                 database: config.MYSQL_SAM_DB,
             });
-    
+
             const promisePool = this.samPool.promise();
             const trimmedSteamId = steamid.trim();
             const [rows] = await promisePool.query(this.adminQuery, this.userID(trimmedSteamId));
@@ -191,22 +195,23 @@ export class MySqlDatabase extends BaseDatabase {
             return result[this.target as keyof typeof result];
         }
     }
+
     public async getLogs(args: Query): Promise<LogEntry[]> {
         try {
             const promisePool = this.pool.promise();
-            const logQuery = this.buildQuery(args);
-            const [rows] = await promisePool.query(logQuery);
+            const { query, values } = this.buildQuery(args);
+            const [rows] = await promisePool.query(query, values);
             return rows as LogEntry[];
         } catch (err) {
             console.error("Error executing query, closing pool and creating a new one", err);
             await this.pool.end();
-            
+
             this.setup().catch(error => {
                 console.error("Error setting up connection pool: ", error);
             });
             const promisePool = this.pool.promise();
-            const logQuery = this.buildQuery(args);
-            const [rows] = await promisePool.query(logQuery);
+            const { query, values } = this.buildQuery(args);
+            const [rows] = await promisePool.query(query, values);
             return rows as LogEntry[];
         }
     }
