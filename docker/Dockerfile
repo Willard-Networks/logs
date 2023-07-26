@@ -6,8 +6,6 @@ COPY . .
 
 RUN apt update
 
-RUN apt install curl python -y
-
 RUN npm install
 
 RUN npm install -g pm2
