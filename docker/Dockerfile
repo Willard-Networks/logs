@@ -4,8 +4,6 @@ WORKDIR /logs
 
 COPY . .
 
-RUN apt update
-
 RUN npm install
 
 RUN npm install -g pm2
