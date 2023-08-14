@@ -43,7 +43,7 @@ dependencies:
     version: 3.6.0
   passport:
     specifier: github:joeyguerra/passport#missing-regenerate-on-req
-    version: git/github.com+joeyguerra/passport/621f6c618258a966d740c116a7656ceaab246e77
+    version: git@github.com+joeyguerra/passport/621f6c618258a966d740c116a7656ceaab246e77
   passport-steam:
     specifier: ^1.0.18
     version: 1.0.18
@@ -4020,7 +4020,7 @@ packages:
       levn: 0.4.1
       prelude-ls: 1.2.1
       type-check: 0.4.0
-      word-wrap: 1.2.3
+      word-wrap: 1.2.5
     dev: true
 
   /p-limit@2.3.0:
@@ -5062,8 +5062,8 @@ packages:
       winston-transport: 4.5.0
     dev: false
 
-  /word-wrap@1.2.3:
-    resolution: {integrity: sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==}
+  /word-wrap@1.2.5:
+    resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -5127,7 +5127,7 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  git/github.com+joeyguerra/passport/621f6c618258a966d740c116a7656ceaab246e77:
+  git@github.com+joeyguerra/passport/621f6c618258a966d740c116a7656ceaab246e77:
     resolution: {commit: 621f6c618258a966d740c116a7656ceaab246e77, repo: git@github.com:joeyguerra/passport.git, type: git}
     name: passport
     version: 0.6.0
