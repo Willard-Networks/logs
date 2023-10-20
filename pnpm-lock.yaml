@@ -95,8 +95,8 @@ devDependencies:
     specifier: ^1.0.12
     version: 1.0.12
   '@types/passport-steam':
-    specifier: ^1.0.2
-    version: 1.0.2
+    specifier: ^1.0.3
+    version: 1.0.3
   '@types/shelljs':
     specifier: ^0.8.12
     version: 0.8.12
@@ -1240,8 +1240,8 @@ packages:
     resolution: {integrity: sha512-EhcH/wvidPy1WeML3TtYFGR83UzjxeWRen9V402T8aUGYsCHOmfoisV3ZSg03gAFIbLq8TnWOJ0f4cALtnSEUg==}
     dev: true
 
-  /@types/passport-steam@1.0.2:
-    resolution: {integrity: sha512-pTFtJjgOoR+2ueBg6sZGcTG2qXJKlyvxTcucu1IK9LSij6fqM/aZVk9YNwyWn2W84tCuExctiWlb7MFceaBbmA==}
+  /@types/passport-steam@1.0.3:
+    resolution: {integrity: sha512-4Qkq/zcTCTBsPFqc3soswr57VNKa1RrS85wuAT5oM6YvLR58RpEv/K//ZGWbZW9J4LpMd2gedHEtf83k0NV9xA==}
     dev: true
 
   /@types/passport@1.0.12:
