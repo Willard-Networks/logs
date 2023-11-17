@@ -98,8 +98,8 @@ devDependencies:
     specifier: ^1.0.4
     version: 1.0.4
   '@types/shelljs':
-    specifier: ^0.8.12
-    version: 0.8.12
+    specifier: ^0.8.15
+    version: 0.8.15
   '@types/steamid':
     specifier: ^2.0.1
     version: 2.0.1
@@ -1264,8 +1264,8 @@ packages:
       '@types/node': 20.3.1
     dev: true
 
-  /@types/shelljs@0.8.12:
-    resolution: {integrity: sha512-ZA8U81/gldY+rR5zl/7HSHrG2KDfEb3lzG6uCUDhW1DTQE9yC/VBQ45fXnXq8f3CgInfhZmjtdu/WOUlrXRQUg==}
+  /@types/shelljs@0.8.15:
+    resolution: {integrity: sha512-vzmnCHl6hViPu9GNLQJ+DZFd6BQI2DBTUeOvYHqkWQLMfKAAQYMb/xAmZkTogZI/vqXHCWkqDRymDI5p0QTi5Q==}
     dependencies:
       '@types/glob': 7.2.0
       '@types/node': 20.3.1
