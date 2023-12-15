@@ -83,8 +83,8 @@ devDependencies:
     specifier: ^29.5.3
     version: 29.5.3
   '@types/jquery':
-    specifier: ^3.5.16
-    version: 3.5.16
+    specifier: ^3.5.29
+    version: 3.5.29
   '@types/lusca':
     specifier: ^1.7.1
     version: 1.7.1
@@ -1192,8 +1192,8 @@ packages:
       pretty-format: 29.5.0
     dev: true
 
-  /@types/jquery@3.5.16:
-    resolution: {integrity: sha512-bsI7y4ZgeMkmpG9OM710RRzDFp+w4P1RGiIt30C1mSBT+ExCleeh4HObwgArnDFELmRrOpXgSYN9VF1hj+f1lw==}
+  /@types/jquery@3.5.29:
+    resolution: {integrity: sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==}
     dependencies:
       '@types/sizzle': 2.3.3
     dev: true
