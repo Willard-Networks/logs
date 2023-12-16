@@ -58,7 +58,7 @@
         "@types/lusca": "^1.7.1",
         "@types/node": "^20.3.1",
         "@types/passport": "^1.0.16",
-        "@types/passport-steam": "^1.0.4",
+        "@types/passport-steam": "^1.0.5",
         "@types/shelljs": "^0.8.15",
         "@types/steamid": "^2.0.1",
         "@types/supertest": "^2.0.12",
