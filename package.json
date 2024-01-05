@@ -56,7 +56,7 @@
         "@types/jest": "^29.5.3",
         "@types/jquery": "^3.5.29",
         "@types/lusca": "^1.7.4",
-        "@types/node": "^20.3.1",
+        "@types/node": "^20.10.6",
         "@types/passport": "^1.0.16",
         "@types/passport-steam": "^1.0.5",
         "@types/shelljs": "^0.8.15",
