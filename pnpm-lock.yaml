@@ -39,8 +39,8 @@ dependencies:
     specifier: 1.7.0
     version: 1.7.0
   mysql2:
-    specifier: ^3.6.0
-    version: 3.6.0
+    specifier: ^3.7.0
+    version: 3.7.0
   passport:
     specifier: github:joeyguerra/passport#missing-regenerate-on-req
     version: git/github.com+joeyguerra/passport/621f6c618258a966d740c116a7656ceaab246e77
@@ -3981,8 +3981,8 @@ packages:
   /ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  /mysql2@3.6.0:
-    resolution: {integrity: sha512-EWUGAhv6SphezurlfI2Fpt0uJEWLmirrtQR7SkbTHFC+4/mJBrPiSzHESHKAWKG7ALVD6xaG/NBjjd1DGJGQQQ==}
+  /mysql2@3.7.0:
+    resolution: {integrity: sha512-c45jA3Jc1X8yJKzrWu1GpplBKGwv/wIV6ITZTlCSY7npF2YfJR+6nMP5e+NTQhUeJPSyOQAbGDCGEHbAl8HN9w==}
     engines: {node: '>= 8.0'}
     dependencies:
       denque: 2.1.0
