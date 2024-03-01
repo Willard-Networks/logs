@@ -101,8 +101,8 @@ devDependencies:
     specifier: ^0.8.15
     version: 0.8.15
   '@types/steamid':
-    specifier: ^2.0.1
-    version: 2.0.1
+    specifier: ^2.0.3
+    version: 2.0.3
   '@types/supertest':
     specifier: ^2.0.12
     version: 2.0.12
@@ -1289,8 +1289,8 @@ packages:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
     dev: true
 
-  /@types/steamid@2.0.1:
-    resolution: {integrity: sha512-B8sy9wfOOeh+yNrFFzyghCQ1n3rssYbTvZD2kXzuy3HSJEK7TVeYnrpXG/0dOKrq1VU8D7cWORgszsdqKBZnVg==}
+  /@types/steamid@2.0.3:
+    resolution: {integrity: sha512-ozNMQViUYLU+NBN4v7X0bV1O8uTL1bA+WvfHtt9IKcydS4tyYKH7w1vq+xcPGWGL0PRhGtY7C1Zhaeyj2IsETw==}
     dev: true
 
   /@types/superagent@4.1.18:
