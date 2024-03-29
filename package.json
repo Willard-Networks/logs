@@ -39,7 +39,7 @@
         "express-session": "^1.18.0",
         "lusca": "1.7.0",
         "mysql2": "^3.9.3",
-        "passport": "^0.7.0",
+        "passport": "github:joeyguerra/passport#missing-regenerate-on-req",
         "passport-steam": "^1.0.18",
         "sqlite": "^4.2.1",
         "sqlite3": "^5.1.7",
