@@ -48,8 +48,8 @@ dependencies:
     specifier: ^1.0.18
     version: 1.0.18
   sqlite:
-    specifier: ^4.2.1
-    version: 4.2.1
+    specifier: ^5.1.1
+    version: 5.1.1
   sqlite3:
     specifier: ^5.1.7
     version: 5.1.7
@@ -4751,9 +4751,6 @@ packages:
   /sqlite3@5.1.7:
     resolution: {integrity: sha512-GGIyOiFaG+TUra3JIfkI/zGP8yZYLPQ0pl1bH+ODjiX57sPhrLU5sQJn1y9bDKZUFYkX1crlrPfSYt0BKKdkog==}
     requiresBuild: true
-    peerDependenciesMeta:
-      node-gyp:
-        optional: true
     dependencies:
       bindings: 1.5.0
       node-addon-api: 7.1.0
@@ -4766,8 +4763,8 @@ packages:
       - supports-color
     dev: false
 
-  /sqlite@4.2.1:
-    resolution: {integrity: sha512-Tll0Ndvnwkuv5Hn6WIbh26rZiYQORuH1t5m/or9LUpSmDmmyFG89G9fKrSeugMPxwmEIXoVxqTun4LbizTs4uw==}
+  /sqlite@5.1.1:
+    resolution: {integrity: sha512-oBkezXa2hnkfuJwUo44Hl9hS3er+YFtueifoajrgidvqsJRQFpc5fKoAkAor1O5ZnLoa28GBScfHXs8j0K358Q==}
     dev: false
 
   /sqlstring-sqlite@0.1.1:
