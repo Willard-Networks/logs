@@ -3,6 +3,34 @@ import passport from "passport";
 import passportSteam from "passport-steam";
 import { WEBSITE_DOMAIN, STEAM_KEY } from "../util/secrets";
 
+interface SteamProfile {
+    provider: "steam";
+    _json: {
+        steamid: string;
+        communityvisibilitystate: number;
+        profilestate: number;
+        personaname: string;
+        commentpermission: number;
+        profileurl: string;
+        avatar: string;
+        avatarmedium: string;
+        avatarfull: string;
+        avatarhash: string;
+        lastlogoff: number;
+        personastate: number;
+        realname: string;
+        primaryclanid: string;
+        timecreated: number;
+        personastateflags: number;
+        loccountrycode: string;
+        locstatecode: string;
+    };
+    id: string;
+    displayName: string;
+    photos: Array<{ value: string }>;
+    identifier?: string;
+}
+
 const SteamStrategy = passportSteam.Strategy;
 export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
     if (req.isAuthenticated()) { return next(); }
@@ -21,11 +49,9 @@ passport.use(new SteamStrategy({
     returnURL: `${WEBSITE_DOMAIN}/auth/steam/return`,
     realm: WEBSITE_DOMAIN,
     apiKey: STEAM_KEY
-}, (identifier: never, profile: { identifier: never; }, done: (arg0: never, arg1: never) => never): void => {
+}, (identifier: string, profile: SteamProfile, done: (error: any, user?: any) => void): void => {
     process.nextTick(() => {
         profile.identifier = identifier;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         return done(null, profile);
     });
 }));
