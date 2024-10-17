@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 
 <head>
   <%- include("partials/head") %>
@@ -60,6 +60,12 @@
         </div>
       </div>
     </form>
+    
+    <div class="form-group row">
+      <div class="col">
+        <a href="./download-logs" class="btn btn-primary">Download recent logs</a>
+      </div>
+    </div>
 
     <div>
       <table id="logTable" class="table table-dark table-striped table-bordered dt-responsive" style="width: 100;">
@@ -98,14 +104,16 @@
               <%= timeConverter(log.datetime) %>
             </td>
             <td>
-              <% if (log.steamid !== undefined && log.steamid !== null) { %>
-              <% if (log.steamid.substring(0, 1)=='9' ) { %>
-              BOT
+              <% if (log.steamid !== undefined && log.steamid !== null && log.steamid !== '') { %>
+              <% if (log.steamid.substring(0, 1) == '9') { %>
+              SERVER
               <% } else { %>
               <a class="text-white" href="https://steamid.io/lookup/<%=log.steamid%>">
                 <%= log.steamid %>
               </a>
               <% } %>
+              <% } else { %>
+                <%= 'SERVER' %>
               <% } %>
             </td>
             <td>

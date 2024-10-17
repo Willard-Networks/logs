@@ -1,4 +1,5 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import compression from "compression";
 import bodyParser from "body-parser";
 import lusca from "lusca";
@@ -52,27 +53,39 @@ app.use(
 export let database: MySqlDatabase;
 
 if (config.DATABASE == "mysql") {
-    database = new MySqlDatabase();
+    database = new MySqlDatabase();  // setup() gets called automatically
 } else {
     throw new Error("Unknown database type: " + config.DATABASE);
 }
 
-(async () => {
-    await database.setup();
-})();
+/**
+ * Rate limiters to prevent brute force attacks.
+ */
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again after 15 minutes"
+});
+
+const authLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour window
+    max: 5, // start blocking after 5 requests
+    message: "Too many accounts created from this IP, please try again after an hour"
+});
 
 /**
  * Primary app routes.
  */
-app.get("/", homeController.index);
-app.get("/account", passportConfig.ensureAuthenticated, userController.account);
-app.get("/logout", userController.logout);
-app.get("/panel", passportConfig.ensureAuthenticated, panelController.index);
+app.get("/", homeController.index, limiter);
+app.get("/account", passportConfig.ensureAuthenticated, userController.account, limiter);
+app.get("/logout", userController.logout, authLimiter);
+app.get("/panel", passportConfig.ensureAuthenticated, panelController.index, limiter);
+app.get("/download-logs", passportConfig.ensureAuthenticated, panelController.downloadLogs, authLimiter);
 
 /**
  * Steam sign in.
  */
-app.get("/auth/steam", authController.passportAuth, passportConfig.ensureAuthenticated);
+app.get("/auth/steam", authController.passportAuth, passportConfig.ensureAuthenticated, authLimiter);
 // workaround
 app.get("/auth/steam/return",
     function (req, res, next) {

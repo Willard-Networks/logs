@@ -1,12 +1,8 @@
-FROM node:current-buster-slim
+FROM node:21-bookworm-slim
 
 WORKDIR /logs
 
 COPY . .
-
-RUN apt update
-
-RUN apt install curl -y
 
 RUN npm install
 
