@@ -10,5 +10,12 @@ export const keepOriginal = (req: Request, _res: Response, next: NextFunction): 
 };
 
 export const postLogin = async(req: Request): Promise<void> => {
-  req.session.rank = await database.getRank(req.user.id);
+  if (req.session && req.user) {
+    try {
+      req.session.rank = await database.getRank(req.user.id);
+    } catch (error) {
+      console.error("Failed to get user rank:", error);
+      req.session.rank = null;
+    }
+  }
 };

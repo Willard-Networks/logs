@@ -6,7 +6,7 @@ import lusca from "lusca";
 import path from "path";
 import cors from "cors";
 import passport from "passport";
-import cookieSession from "cookie-session";
+import session from "express-session";
 
 // Controllers (route handlers)
 import * as homeController from "./controllers/home";
@@ -31,10 +31,15 @@ app.use(compression());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieSession({
-    name: "rememberSteamLogin",
-    keys: [config.SESSION_SECRET],
-    maxAge: 24 * 60 * 60 * 1000 * 30 // 30 days
+app.use(session({
+    secret: config.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === "production", // Only use secure cookies in production
+        httpOnly: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -94,7 +99,9 @@ app.get("/auth/steam/return",
     },
     passport.authenticate("steam", { failureRedirect: "/" }),
     async function (req, res) {
-        req.session.rank = await database.getRank(req.user.id);
+        if (req.session) {
+            req.session.rank = await database.getRank(req.user.id);
+        }
         res.redirect("/");
     }
 );
