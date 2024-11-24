@@ -40,7 +40,11 @@ const redisClient = createClient({
     }
 });
 
-redisClient.on("error", (err) => console.error("Redis Client Error", err));
+redisClient.on("error", (err) => {
+    console.error("Redis Client Error", err);
+    // Don't crash the app, but log the error
+});
+
 redisClient.on("connect", () => console.log("Redis Client Connected"));
 redisClient.on("reconnecting", () => console.log("Redis Client Reconnecting"));
 
@@ -67,17 +71,21 @@ app.use(compression());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Session configuration
 app.use(session({
     store: redisStore,
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === "production", // Only use secure cookies in production
+        secure: false, // Set to true only in production with HTTPS
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-    }
+    },
+    rolling: true // Resets the cookie maxAge on every response
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(lusca.xframe("SAMEORIGIN"));
@@ -86,7 +94,6 @@ app.use((req, res, next) => {
     res.locals.user = req.user;
     next();
 });
-
 
 app.use(
     express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
@@ -128,7 +135,7 @@ app.get("/download-logs", passportConfig.ensureAuthenticated, panelController.do
  * Steam sign in.
  */
 app.get("/auth/steam", authController.passportAuth, passportConfig.ensureAuthenticated, authLimiter);
-// workaround
+
 app.get("/auth/steam/return",
     function (req, res, next) {
         req.url = req.originalUrl;
@@ -136,10 +143,19 @@ app.get("/auth/steam/return",
     },
     passport.authenticate("steam", { failureRedirect: "/" }),
     async function (req, res) {
-        if (req.session) {
-            req.session.rank = await database.getRank(req.user.id);
+        try {
+            await authController.postLogin(req);
+            // Save the session explicitly after setting rank
+            req.session.save((err) => {
+                if (err) {
+                    console.error("Failed to save session:", err);
+                }
+                res.redirect("/");
+            });
+        } catch (error) {
+            console.error("Authentication error:", error);
+            res.redirect("/");
         }
-        res.redirect("/");
     }
 );
 
