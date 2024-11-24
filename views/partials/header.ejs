@@ -20,7 +20,7 @@
         <% if(user) { %>
         <li class="nav-item">
           <a class="nav-link" href="/account">
-            <img class="avatar" src=<%= user.photos[0].value %> /><%= user.displayName %> <i class="fa fa-user"></i>
+            <img class="avatar" src="<%= user.photos && user.photos[0] ? user.photos[0].value : user.avatar %>" /><%= user.displayName %> <i class="fa fa-user"></i>
           </a>
         </li>
         <li class="nav-item">

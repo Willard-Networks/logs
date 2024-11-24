@@ -1,4 +1,9 @@
 version: "3.8"
+
+networks:
+  logs-network:
+    driver: bridge
+
 services:
   willard-logs:
     container_name: willard-logs
@@ -24,11 +29,31 @@ services:
       - ADMIN_MOD=${ADMIN_MOD}
       - STEAM_KEY=${STEAM_KEY}
       - ALLOWED_RANKS=${ALLOWED_RANKS}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     hostname: logs.willard.local
-    network_mode: "bridge"
+    networks:
+      - logs-network
     healthcheck:
       test: ["CMD", "curl", "http://logs.willard.local:3335"]
       interval: 60s
       timeout: 10s
       retries: 3
       start_period: 10s
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: willard-logs-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - logs-network
+
+volumes:
+  redis-data:
