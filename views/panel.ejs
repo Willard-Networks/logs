@@ -140,7 +140,7 @@
     
     <div class="form-group row">
       <div class="col">
-        <a href="./download-logs" class="btn btn-primary">Download recent logs</a>
+        <a href="./download-logs" id="downloadBtn" class="btn btn-primary">Download current logs</a>
       </div>
     </div>
 
@@ -229,6 +229,19 @@
       
       $('#logTable').dataTable({
         "order": [[0, "desc"]]
+      });
+
+      // Update download button URL with current search parameters
+      function updateDownloadUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.href = './download-logs' + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      }
+
+      // Update download URL on page load and after form submission
+      updateDownloadUrl();
+      $("#logForm").on("submit", function() {
+        setTimeout(updateDownloadUrl, 100); // Small delay to ensure URL is updated
       });
 
       // Format log data for display
