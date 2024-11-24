@@ -33,4 +33,5 @@ export default [{
 
         "@typescript-eslint/no-unused-vars": "warn",
     },
+    ignores: ["src/public/", "src/types/", "dist/*", "coverage/*", "**/*.d.ts"]
 }];
