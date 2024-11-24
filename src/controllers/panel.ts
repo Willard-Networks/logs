@@ -56,8 +56,18 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
     const logs: LogEntry[] = await database.getLogs(req.query);
     const formattedLogs = formatLogs(logs);
 
+    // Generate filename with current timestamp in format: YYYY-MM-DD_HH-mm-ss
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+    const filePath = `logs-${timestamp}.txt`;
+
     // Write logs to file
-    const filePath = "fetched-logs.txt";
     fs.writeFile(filePath, formattedLogs, (err: unknown) => {
         if (err) {
             console.log(err);
@@ -70,6 +80,10 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
                     console.log(err);
                     res.status(500).send("Error downloading file");
                 }
+                // Clean up: delete the file after download
+                fs.unlink(filePath, (err) => {
+                    if (err) console.log("Error deleting temporary file:", err);
+                });
             });
         }
     });
