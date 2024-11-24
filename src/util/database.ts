@@ -10,6 +10,8 @@ abstract class BaseDatabase {
 
     abstract getRank(steamid: string): Promise<string | undefined>;
     abstract getLogs(query: Query): Promise<LogEntry[]>;
+    abstract getLogById(id: number): Promise<LogEntry | null>;
+    abstract getLogsByTimeRange(startTime: number, endTime: number): Promise<LogEntry[]>;
 
     protected constructor() {
         let target, table, identifier;
@@ -213,6 +215,32 @@ export class MySqlDatabase extends BaseDatabase {
             const { query, values } = this.buildQuery(args);
             const [rows] = await promisePool.query(query, values);
             return rows as LogEntry[];
+        }
+    }
+
+    public async getLogById(id: number): Promise<LogEntry | null> {
+        try {
+            const promisePool = this.pool.promise();
+            const [rows] = await promisePool.query('SELECT * FROM ix_logs WHERE id = ? LIMIT 1', [id]);
+            const logEntries = rows as LogEntry[];
+            return logEntries.length > 0 ? logEntries[0] : null;
+        } catch (err) {
+            console.error("Error executing query", err);
+            return null;
+        }
+    }
+
+    public async getLogsByTimeRange(startTime: number, endTime: number): Promise<LogEntry[]> {
+        try {
+            const promisePool = this.pool.promise();
+            const [rows] = await promisePool.query(
+                'SELECT * FROM ix_logs WHERE datetime BETWEEN ? AND ? ORDER BY datetime ASC',
+                [startTime, endTime]
+            );
+            return rows as LogEntry[];
+        } catch (err) {
+            console.error("Error executing query", err);
+            return [];
         }
     }
 }

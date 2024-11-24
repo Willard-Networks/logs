@@ -129,6 +129,7 @@ app.get("/", homeController.index, limiter);
 app.get("/account", passportConfig.ensureAuthenticated, userController.account, limiter);
 app.get("/logout", userController.logout, authLimiter);
 app.get("/panel", passportConfig.ensureAuthenticated, panelController.index, limiter);
+app.get("/panel/context/:logId", passportConfig.ensureAuthenticated, panelController.getLogContext, limiter);
 app.get("/download-logs", passportConfig.ensureAuthenticated, panelController.downloadLogs, authLimiter);
 
 /**
