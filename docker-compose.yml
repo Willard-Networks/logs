@@ -24,6 +24,8 @@ services:
       - ADMIN_MOD=${ADMIN_MOD}
       - STEAM_KEY=${STEAM_KEY}
       - ALLOWED_RANKS=${ALLOWED_RANKS}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     hostname: logs.willard.local
     network_mode: "bridge"
     healthcheck:
@@ -32,3 +34,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: willard-logs-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    network_mode: "bridge"
+
+volumes:
+  redis-data:

@@ -29,6 +29,7 @@
     "dependencies": {
         "body-parser": "1.20.2",
         "compression": "1.7.4",
+        "connect-redis": "^7.1.1",
         "cors": "^2.8.5",
         "dotenv": "16.3.1",
         "ejs": "^3.1.9",
@@ -40,6 +41,7 @@
         "mysql2": "^3.9.3",
         "passport": "^0.7.0",
         "passport-steam": "^1.0.18",
+        "redis": "^4.7.0",
         "sqlite": "^4.2.1",
         "sqlite3": "^5.1.7",
         "sqlstring-sqlite": "^0.1.1",

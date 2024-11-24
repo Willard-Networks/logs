@@ -7,6 +7,8 @@ import path from "path";
 import cors from "cors";
 import passport from "passport";
 import session from "express-session";
+import { createClient } from "redis";
+import RedisStore from "connect-redis";
 
 // Controllers (route handlers)
 import * as homeController from "./controllers/home";
@@ -23,6 +25,18 @@ import {MySqlDatabase} from "./util/database";
 // Create Express server
 const app = express();
 
+// Redis client setup
+const redisClient = createClient({
+    url: `redis://${process.env.REDIS_HOST || "localhost"}:${process.env.REDIS_PORT || 6379}`
+});
+redisClient.connect().catch(console.error);
+
+// Initialize store
+const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "helix-logs:",
+});
+
 // Express configuration
 app.set("port", process.env.PORT || 3000);
 app.set("views", path.join(__dirname, "../views"));
@@ -32,6 +46,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
+    store: redisStore,
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -105,4 +120,10 @@ app.get("/auth/steam/return",
         res.redirect("/");
     }
 );
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+    redisClient.quit();
+});
+
 export default app;

@@ -31,18 +31,32 @@ interface SteamProfile {
     identifier?: string;
 }
 
+interface SerializedUser {
+    id: string;
+    displayName: string;
+    avatar: string;
+}
+
 const SteamStrategy = passportSteam.Strategy;
 export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
     if (req.isAuthenticated()) { return next(); }
     res.redirect("/");
 };
 
-passport.serializeUser((user, done): void => {
-    done(null, user);
+passport.serializeUser((user: Express.User, done): void => {
+    const steamUser = user as SteamProfile;
+    // Only serialize essential user data
+    const serializedUser: SerializedUser = {
+        id: steamUser.id,
+        displayName: steamUser.displayName,
+        avatar: steamUser._json.avatar
+    };
+    done(null, serializedUser);
 });
 
-passport.deserializeUser((obj: boolean | Express.User, done: (arg0: null, arg1: unknown) => void): void => {
-    done(null, obj);
+passport.deserializeUser((serializedUser: SerializedUser, done: (arg0: null, arg1: unknown) => void): void => {
+    // Return the serialized user directly since it contains the essential data
+    done(null, serializedUser);
 });
 
 passport.use(new SteamStrategy({
