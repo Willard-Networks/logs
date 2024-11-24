@@ -7,7 +7,6 @@ import path from "path";
 import cors from "cors";
 import passport from "passport";
 import session from "express-session";
-import { createClient } from "redis";
 import RedisStore from "connect-redis";
 
 // Controllers (route handlers)
@@ -20,42 +19,11 @@ import * as panelController from "./controllers/panel";
 import * as passportConfig from "./config/passport";
 
 import * as config from "./util/secrets";
-import {MySqlDatabase} from "./util/database";
+import { MySqlDatabase } from "./util/database";
+import redisClient from "./util/redis";
 
 // Create Express server
 const app = express();
-
-// Redis client setup with retry logic
-const redisClient = createClient({
-    url: `redis://${process.env.REDIS_HOST || "localhost"}:${process.env.REDIS_PORT || 6379}`,
-    socket: {
-        reconnectStrategy: (retries) => {
-            if (retries > 20) {
-                console.error("Redis connection failed after 20 retries");
-                return new Error("Redis connection failed");
-            }
-            // Retry with exponential backoff
-            return Math.min(retries * 100, 3000);
-        }
-    }
-});
-
-redisClient.on("error", (err) => {
-    console.error("Redis Client Error", err);
-    // Don't crash the app, but log the error
-});
-
-redisClient.on("connect", () => console.log("Redis Client Connected"));
-redisClient.on("reconnecting", () => console.log("Redis Client Reconnecting"));
-
-// Connect to Redis
-(async () => {
-    try {
-        await redisClient.connect();
-    } catch (err) {
-        console.error("Failed to connect to Redis:", err);
-    }
-})();
 
 // Initialize store
 const redisStore = new RedisStore({
@@ -159,11 +127,5 @@ app.get("/auth/steam/return",
         }
     }
 );
-
-// Graceful shutdown
-process.on("SIGTERM", async () => {
-    console.log("Received SIGTERM signal, closing Redis connection...");
-    await redisClient.quit();
-});
 
 export default app;

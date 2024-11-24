@@ -3,6 +3,7 @@ import fs from "fs";
 
 import { LogEntry } from "../types/logs";
 import { formatLogs } from "../util/logFormatter";
+import { cacheLogContext, getCachedLogContext, cacheUserRank, getCachedUserRank } from "../util/redis";
 
 import * as config from "../util/secrets";
 
@@ -13,7 +14,18 @@ import { database } from "../app";
  * @route GET /panel
  */
 export const index = async (req: Request, res: Response): Promise<void> => {
-    const rank = await database.getRank(req.user.id);
+    // Try to get cached rank first
+    const cachedRank = await getCachedUserRank(req.user.id);
+    let rank = cachedRank;
+
+    if (!cachedRank) {
+        // If not in cache, get from database
+        rank = await database.getRank(req.user.id);
+        // Cache the rank for future requests
+        if (rank) {
+            await cacheUserRank(req.user.id, rank);
+        }
+    }
 
     if (!rank) {
         res.status(403).send("You need to join the server first!");
@@ -42,7 +54,7 @@ export const index = async (req: Request, res: Response): Promise<void> => {
  * @route GET /panel/context/:logId
  */
 export const getLogContext = async (req: Request, res: Response): Promise<void> => {
-    const rank = await database.getRank(req.user.id);
+    const rank = await getCachedUserRank(req.user.id) || await database.getRank(req.user.id);
 
     if (!rank || !config.ALLOWED_RANKS.includes(rank)) {
         res.status(403).send("Unauthorized");
@@ -56,7 +68,14 @@ export const getLogContext = async (req: Request, res: Response): Promise<void> 
     }
 
     try {
-        // Get the target log first to get its datetime
+        // Try to get cached context first
+        const cachedContext = await getCachedLogContext(logId);
+        if (cachedContext) {
+            res.json(cachedContext);
+            return;
+        }
+
+        // If not in cache, fetch from database
         const targetLog = await database.getLogById(logId);
         if (!targetLog) {
             res.status(404).send("Log not found");
@@ -74,11 +93,16 @@ export const getLogContext = async (req: Request, res: Response): Promise<void> 
         const beforeLogs = contextLogs.filter(log => log.datetime < targetLog.datetime);
         const afterLogs = contextLogs.filter(log => log.datetime > targetLog.datetime);
 
-        res.json({
+        const contextData = {
             before: beforeLogs,
             target: targetLog,
             after: afterLogs
-        });
+        };
+
+        // Cache the context data
+        await cacheLogContext(logId, contextData);
+
+        res.json(contextData);
     } catch (error) {
         console.error("Error fetching log context:", error);
         res.status(500).send("Error fetching log context");
@@ -86,7 +110,7 @@ export const getLogContext = async (req: Request, res: Response): Promise<void> 
 };
 
 export const downloadLogs = async (req: Request, res: Response): Promise<void> => {
-    const rank = await database.getRank(req.user.id);
+    const rank = await getCachedUserRank(req.user.id) || await database.getRank(req.user.id);
 
     if (!rank) {
         res.status(403).send("You need to join the server first!");
@@ -107,11 +131,11 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
     // Generate filename with current timestamp in format: YYYY-MM-DD_HH-mm-ss
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
     const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
     const filePath = `logs-${timestamp}.txt`;
 
