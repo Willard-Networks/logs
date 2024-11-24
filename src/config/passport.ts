@@ -46,12 +46,18 @@ export const ensureAuthenticated = (req: Request, res: Response, next: NextFunct
 
 passport.serializeUser((user: Express.User, done): void => {
     const steamUser = user as SteamProfile;
-    // Include photos in serialized user data
+    // Include all avatar sizes in photos array
+    const photos = [
+        { value: steamUser._json.avatar },        // Small
+        { value: steamUser._json.avatarmedium },  // Medium
+        { value: steamUser._json.avatarfull }     // Full
+    ];
+    
     const serializedUser: SerializedUser = {
         id: steamUser.id,
         displayName: steamUser.displayName,
         avatar: steamUser._json.avatar,
-        photos: steamUser.photos || [{ value: steamUser._json.avatar }] // Fallback to avatar if photos not available
+        photos: photos
     };
     done(null, serializedUser);
 });
@@ -67,10 +73,12 @@ passport.use(new SteamStrategy({
     apiKey: STEAM_KEY
 }, (identifier: string, profile: SteamProfile, done: (error: any, user?: any) => void): void => {
     process.nextTick(() => {
-        // Ensure photos array exists
-        if (!profile.photos) {
-            profile.photos = [{ value: profile._json.avatar }];
-        }
+        // Ensure all avatar sizes are available in photos array
+        profile.photos = [
+            { value: profile._json.avatar },        // Small
+            { value: profile._json.avatarmedium },  // Medium
+            { value: profile._json.avatarfull }     // Full
+        ];
         profile.identifier = identifier;
         return done(null, profile);
     });
