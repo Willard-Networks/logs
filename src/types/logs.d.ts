@@ -1,8 +1,15 @@
 export interface LogEntry {
-    type: string | null;
-    string: string | null;
-    time: number;
-    steamid: string | null;
-    itemid: string | null;
-    charid: string | null;
+    id: number;
+    steamid: string;
+    char_id: number;
+    log_type: string;
+    pos_x: number;
+    pos_y: number;
+    pos_z: number;
+    map: string;
+    datetime: number;
+    text: string;
+    lookup1: string | null;
+    lookup2: string | null;
+    lookup3: string | null;
 }
