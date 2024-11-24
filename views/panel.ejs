@@ -3,6 +3,66 @@
 
 <head>
   <%- include("partials/head") %>
+  <style>
+    .context-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .context-modal-content {
+      background-color: #1a1a1a;
+      margin: 5% auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 1200px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      color: #fff;
+    }
+
+    .close-modal {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-modal:hover {
+      color: #fff;
+    }
+
+    .context-section {
+      margin: 15px 0;
+      padding: 10px;
+      border: 1px solid #333;
+    }
+
+    .context-section h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+
+    .target-log {
+      background-color: #2d4373;
+      border: 1px solid #385490;
+    }
+
+    .log-row {
+      cursor: pointer;
+    }
+
+    .log-row:hover {
+      background-color: #2d2d2d !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -88,9 +148,8 @@
           </tr>
         </thead>
         <tbody>
-
           <% logs.forEach(function (log) { %>
-          <tr>
+          <tr class="log-row" data-log-id="<%= log.id %>">
             <th scope="log">
               <%= log.id %>
             </th>
@@ -126,31 +185,121 @@
     </div>
   </div>
 
+  <!-- Context Modal -->
+  <div id="contextModal" class="context-modal">
+    <div class="context-modal-content">
+      <span class="close-modal">&times;</span>
+      <div id="beforeContext" class="context-section">
+        <h3>Before</h3>
+        <div class="content"></div>
+      </div>
+      <div id="targetContext" class="context-section target-log">
+        <h3>Selected Log</h3>
+        <div class="content"></div>
+      </div>
+      <div id="afterContext" class="context-section">
+        <h3>After</h3>
+        <div class="content"></div>
+      </div>
+    </div>
+  </div>
+
   <%- include("partials/footer") %> <%- include("partials/scripts") %>
   <script>
     $(document).ready(function () {
+      const modal = document.getElementById('contextModal');
+      const closeBtn = document.getElementsByClassName('close-modal')[0];
+      
       $('#logTable').dataTable({
         "order": [[0, "desc"]]
-      })
-    })
+      });
 
-    $(document).ready(function () {
+      // Format log data for display
+      function formatLogRow(log) {
+        let steamidDisplay = log.steamid;
+        if (log.steamid) {
+          if (log.steamid.substring(0, 1) === '9') {
+            steamidDisplay = 'SERVER';
+          } else {
+            steamidDisplay = `<a class="text-white" href="https://steamid.io/lookup/${log.steamid}">${log.steamid}</a>`;
+          }
+        } else {
+          steamidDisplay = 'SERVER';
+        }
+
+        return `
+          <tr>
+            <td>${log.id}</td>
+            <td>${log.log_type}</td>
+            <td>${log.text}</td>
+            <td>${timeConverter(log.datetime)}</td>
+            <td>${steamidDisplay}</td>
+            <td>${log.char_id}</td>
+          </tr>
+        `;
+      }
+
+      // Handle log row clicks
+      $('.log-row').click(function() {
+        const logId = $(this).data('log-id');
+        
+        // Fetch context logs
+        fetch(`/panel/context/${logId}`)
+          .then(response => response.json())
+          .then(data => {
+            // Clear previous content
+            $('#beforeContext .content').empty();
+            $('#targetContext .content').empty();
+            $('#afterContext .content').empty();
+
+            // Create tables for each section
+            const beforeTable = $('<table class="table table-dark table-striped">').appendTo('#beforeContext .content');
+            const targetTable = $('<table class="table table-dark table-striped">').appendTo('#targetContext .content');
+            const afterTable = $('<table class="table table-dark table-striped">').appendTo('#afterContext .content');
+
+            // Add content
+            data.before.forEach(log => {
+              beforeTable.append(formatLogRow(log));
+            });
+            targetTable.append(formatLogRow(data.target));
+            data.after.forEach(log => {
+              afterTable.append(formatLogRow(log));
+            });
+
+            // Show modal
+            modal.style.display = 'block';
+          })
+          .catch(error => console.error('Error fetching context:', error));
+      });
+
+      // Close modal when clicking X
+      closeBtn.onclick = function() {
+        modal.style.display = 'none';
+      }
+
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      }
+
       $("form").submit(function () {
         $("input").each(function (index, obj) {
           if ($(obj).val() == "") {
-            $(obj).remove()
+            $(obj).remove();
           }
-        })
-      })
+        });
+      });
 
       $("#datetime1").focus(function () {
-        $(this).attr({ type: 'datetime-local' })
+        $(this).attr({ type: 'datetime-local' });
       });
 
       $("#datetime2").focus(function () {
-        $(this).attr({ type: 'datetime-local' })
-      })
-    })
+        $(this).attr({ type: 'datetime-local' });
+      });
+    });
   </script>
 </body>
 

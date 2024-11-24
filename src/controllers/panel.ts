@@ -37,6 +37,45 @@ export const index = async (req: Request, res: Response): Promise<void> => {
     });
 };
 
+/**
+ * Get context logs around a specific log entry.
+ * @route GET /panel/context/:logId
+ */
+export const getLogContext = async (req: Request, res: Response): Promise<void> => {
+    const rank = await database.getRank(req.user.id);
+
+    if (!rank || !config.ALLOWED_RANKS.includes(rank)) {
+        res.status(403).send("Unauthorized");
+        return;
+    }
+
+    const logId = parseInt(req.params.logId);
+    if (isNaN(logId)) {
+        res.status(400).send("Invalid log ID");
+        return;
+    }
+
+    // Get the target log first to get its datetime
+    const targetLog = await database.getLogById(logId);
+    if (!targetLog) {
+        res.status(404).send("Log not found");
+        return;
+    }
+
+    // Get logs within 5 minutes before and after the target log
+    const contextTimeRange = 5 * 60; // 5 minutes in seconds
+    const beforeTime = targetLog.datetime - contextTimeRange;
+    const afterTime = targetLog.datetime + contextTimeRange;
+
+    const contextLogs = await database.getLogsByTimeRange(beforeTime, afterTime);
+    
+    res.json({
+        before: contextLogs.filter(log => log.datetime < targetLog.datetime),
+        target: targetLog,
+        after: contextLogs.filter(log => log.datetime > targetLog.datetime)
+    });
+};
+
 export const downloadLogs = async (req: Request, res: Response): Promise<void> => {
     const rank = await database.getRank(req.user.id);
 
