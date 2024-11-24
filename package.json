@@ -61,7 +61,7 @@
         "@types/passport-steam": "^1.0.5",
         "@types/shelljs": "^0.8.15",
         "@types/steamid": "^2.0.3",
-        "@types/supertest": "^2.0.16",
+        "@types/supertest": "^6.0.2",
         "@typescript-eslint/eslint-plugin": "^5.62.0",
         "@typescript-eslint/parser": "^5.62.0",
         "chai": "^4.4.1",
