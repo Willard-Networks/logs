@@ -25,11 +25,33 @@ import {MySqlDatabase} from "./util/database";
 // Create Express server
 const app = express();
 
-// Redis client setup
+// Redis client setup with retry logic
 const redisClient = createClient({
-    url: `redis://${process.env.REDIS_HOST || "localhost"}:${process.env.REDIS_PORT || 6379}`
+    url: `redis://${process.env.REDIS_HOST || "localhost"}:${process.env.REDIS_PORT || 6379}`,
+    socket: {
+        reconnectStrategy: (retries) => {
+            if (retries > 20) {
+                console.error("Redis connection failed after 20 retries");
+                return new Error("Redis connection failed");
+            }
+            // Retry with exponential backoff
+            return Math.min(retries * 100, 3000);
+        }
+    }
 });
-redisClient.connect().catch(console.error);
+
+redisClient.on("error", (err) => console.error("Redis Client Error", err));
+redisClient.on("connect", () => console.log("Redis Client Connected"));
+redisClient.on("reconnecting", () => console.log("Redis Client Reconnecting"));
+
+// Connect to Redis
+(async () => {
+    try {
+        await redisClient.connect();
+    } catch (err) {
+        console.error("Failed to connect to Redis:", err);
+    }
+})();
 
 // Initialize store
 const redisStore = new RedisStore({
@@ -122,8 +144,9 @@ app.get("/auth/steam/return",
 );
 
 // Graceful shutdown
-process.on("SIGTERM", () => {
-    redisClient.quit();
+process.on("SIGTERM", async () => {
+    console.log("Received SIGTERM signal, closing Redis connection...");
+    await redisClient.quit();
 });
 
 export default app;

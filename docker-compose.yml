@@ -1,4 +1,9 @@
 version: "3.8"
+
+networks:
+  logs-network:
+    driver: bridge
+
 services:
   willard-logs:
     container_name: willard-logs
@@ -27,7 +32,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     hostname: logs.willard.local
-    network_mode: "bridge"
+    networks:
+      - logs-network
     healthcheck:
       test: ["CMD", "curl", "http://logs.willard.local:3335"]
       interval: 60s
@@ -45,7 +51,11 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
-    network_mode: "bridge"
+    networks:
+      - logs-network
+    sysctls:
+      - net.core.somaxconn=512
+      - vm.overcommit_memory=1
 
 volumes:
   redis-data:
