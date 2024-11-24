@@ -19,6 +19,7 @@
       background-color: #1a1a1a;
       margin: 5% auto;
       padding: 20px;
+      padding-top: 40px; /* Add padding to account for fixed close button */
       width: 90%;
       max-width: 1200px;
       max-height: 90vh;
@@ -28,15 +29,31 @@
     }
 
     .close-modal {
-      color: #aaa;
-      float: right;
+      position: fixed;
+      right: calc(5% + 20px); /* Align with modal content padding */
+      top: calc(5% + 10px); /* Align with modal content top */
+      color: #fff;
       font-size: 28px;
       font-weight: bold;
       cursor: pointer;
+      background-color: #333;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
     }
 
     .close-modal:hover {
-      color: #fff;
+      background-color: #555;
+    }
+
+    @media (max-width: 1200px) {
+      .close-modal {
+        right: 20px; /* For smaller screens, stick to the window edge */
+      }
     }
 
     .context-section {

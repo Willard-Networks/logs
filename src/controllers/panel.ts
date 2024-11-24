@@ -55,25 +55,34 @@ export const getLogContext = async (req: Request, res: Response): Promise<void> 
         return;
     }
 
-    // Get the target log first to get its datetime
-    const targetLog = await database.getLogById(logId);
-    if (!targetLog) {
-        res.status(404).send("Log not found");
-        return;
+    try {
+        // Get the target log first to get its datetime
+        const targetLog = await database.getLogById(logId);
+        if (!targetLog) {
+            res.status(404).send("Log not found");
+            return;
+        }
+
+        // Get logs within 5 minutes before and after the target log
+        const contextTimeRange = 5 * 60; // 5 minutes in seconds
+        const beforeTime = targetLog.datetime - contextTimeRange;
+        const afterTime = targetLog.datetime + contextTimeRange;
+
+        const contextLogs = await database.getLogsByTimeRange(beforeTime, afterTime);
+        
+        // Split logs into before and after
+        const beforeLogs = contextLogs.filter(log => log.datetime < targetLog.datetime);
+        const afterLogs = contextLogs.filter(log => log.datetime > targetLog.datetime);
+
+        res.json({
+            before: beforeLogs,
+            target: targetLog,
+            after: afterLogs
+        });
+    } catch (error) {
+        console.error("Error fetching log context:", error);
+        res.status(500).send("Error fetching log context");
     }
-
-    // Get logs within 5 minutes before and after the target log
-    const contextTimeRange = 5 * 60; // 5 minutes in seconds
-    const beforeTime = targetLog.datetime - contextTimeRange;
-    const afterTime = targetLog.datetime + contextTimeRange;
-
-    const contextLogs = await database.getLogsByTimeRange(beforeTime, afterTime);
-    
-    res.json({
-        before: contextLogs.filter(log => log.datetime < targetLog.datetime),
-        target: targetLog,
-        after: contextLogs.filter(log => log.datetime > targetLog.datetime)
-    });
 };
 
 export const downloadLogs = async (req: Request, res: Response): Promise<void> => {
