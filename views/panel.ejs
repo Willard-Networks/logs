@@ -68,27 +68,6 @@
 <body>
   <%- include("partials/header") %>
   <div class="container pl-sm-0 pr-sm-0 pl-lg-3 pr-lg-3">
-    <% 
-      function timeConverter(UNIX_timestamp) {
-          var isAfternoon = false
-          const a = new Date(UNIX_timestamp * 1000)
-          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-          const year = a.getFullYear()
-          const month = months[a.getMonth()]
-          const date = a.getDate()
-          var hour = a.getHours()
-          const min = a.getMinutes() < 10 ? '0' + a.getMinutes() : a.getMinutes()
-          const sec = a.getSeconds() < 10 ? '0' + a.getSeconds() : a.getSeconds()
-
-          if (hour >= 12) {
-              isAfternoon = true
-              hour = hour == 12 ? 12 : hour - 12 
-          }
-
-          return `${month} ${date}, ${year} ${hour}:${min}:${sec} ${isAfternoon ? 'PM' : 'AM'}`
-      }
-    %>
-
     <form id="logForm" action="#" method="GET">
       <div class="form-group row">
         <div class="col">
@@ -206,6 +185,26 @@
 
   <%- include("partials/footer") %> <%- include("partials/scripts") %>
   <script>
+    // Time converter function available in both EJS and JavaScript contexts
+    function timeConverter(UNIX_timestamp) {
+      var isAfternoon = false;
+      const a = new Date(UNIX_timestamp * 1000);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const year = a.getFullYear();
+      const month = months[a.getMonth()];
+      const date = a.getDate();
+      var hour = a.getHours();
+      const min = a.getMinutes() < 10 ? '0' + a.getMinutes() : a.getMinutes();
+      const sec = a.getSeconds() < 10 ? '0' + a.getSeconds() : a.getSeconds();
+
+      if (hour >= 12) {
+        isAfternoon = true;
+        hour = hour == 12 ? 12 : hour - 12;
+      }
+
+      return `${month} ${date}, ${year} ${hour}:${min}:${sec} ${isAfternoon ? 'PM' : 'AM'}`;
+    }
+
     $(document).ready(function () {
       const modal = document.getElementById('contextModal');
       const closeBtn = document.getElementsByClassName('close-modal')[0];
