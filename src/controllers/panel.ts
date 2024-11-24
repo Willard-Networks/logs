@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import fs from "fs";
 
 import { LogEntry } from "../types/logs";
+import { formatLogs } from "../util/logFormatter";
 
 import * as config from "../util/secrets";
 
@@ -53,16 +54,17 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
     }
 
     const logs: LogEntry[] = await database.getLogs(req.query);
+    const formattedLogs = formatLogs(logs);
 
     // Write logs to file
-    const filePath = "fetched-logs.json";
-    fs.writeFile(filePath, JSON.stringify(logs, null, 2), (err: unknown) => {
+    const filePath = "fetched-logs.txt";
+    fs.writeFile(filePath, formattedLogs, (err: unknown) => {
         if (err) {
             console.log(err);
             res.status(500).send("Error writing to file");
         } else {
             // Set the headers and send the file
-            res.setHeader("Content-Type", "application/json");
+            res.setHeader("Content-Type", "text/plain");
             res.download(filePath, (err: unknown) => {
                 if (err) {
                     console.log(err);
