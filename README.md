@@ -14,7 +14,7 @@ A logger for the Helix roleplaying framework written in Node.js with Typescript.
   - Steam ID's
 - HTTP and HTTPS support
 - Mobile friendly
-- Download recent logs
+- Download logs contextually
 - Docker support
 - Rate limiting support
 - Contextual logs
