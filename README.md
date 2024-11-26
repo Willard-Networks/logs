@@ -14,14 +14,16 @@ A logger for the Helix roleplaying framework written in Node.js with Typescript.
   - Steam ID's
 - HTTP and HTTPS support
 - Mobile friendly
-- Download recent logs
+- Download logs contextually
 - Docker support
 - Rate limiting support
+- Contextual logs
 
 # Requirements
 - [Node.js](https://nodejs.org/en/)
 - [Helix](https://github.com/NebulousCloud/helix) updated since May 11th, 2021
 - [SQL Helix Plugin](https://github.com/wildflowericecoffee/helix-plugins/tree/main/logger.lua)
+- [Redis](https://redis.io/)
 - An admin addon. SAM, ServerGuard and ULX are supported.
 
 # Getting started

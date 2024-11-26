@@ -10,5 +10,23 @@ export const keepOriginal = (req: Request, _res: Response, next: NextFunction): 
 };
 
 export const postLogin = async(req: Request): Promise<void> => {
-  req.session.rank = await database.getRank(req.user.id);
+  if (!req.session) {
+    throw new Error("No session found");
+  }
+  
+  if (!req.user) {
+    throw new Error("No user found in request");
+  }
+
+  try {
+    const rank = await database.getRank(req.user.id);
+    req.session.rank = rank;
+    
+    // Touch the session to ensure it's saved
+    req.session.touch();
+  } catch (error) {
+    console.error("Failed to get user rank:", error);
+    req.session.rank = null;
+    throw error;
+  }
 };
