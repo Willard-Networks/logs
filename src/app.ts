@@ -21,6 +21,7 @@ import * as passportConfig from "./config/passport";
 import * as config from "./util/secrets";
 import { MySqlDatabase } from "./util/database";
 import redisClient from "./util/redis";
+import { requireAuthorization } from "./util/authUtils";
 
 // Create Express server
 const app = express();
@@ -96,10 +97,10 @@ const authLimiter = rateLimit({
 app.get("/", homeController.index, limiter);
 app.get("/account", passportConfig.ensureAuthenticated, userController.account, limiter);
 app.get("/logout", userController.logout, authLimiter);
-app.get("/panel", passportConfig.ensureAuthenticated, panelController.index, limiter);
-app.get("/panel/context/:logId", passportConfig.ensureAuthenticated, panelController.getLogContext, limiter);
-app.get("/download-logs", passportConfig.ensureAuthenticated, panelController.downloadLogs, authLimiter);
-app.get("/ticket-statistics", passportConfig.ensureAuthenticated, panelController.ticketStatistics, limiter);
+app.get("/panel", passportConfig.ensureAuthenticated, requireAuthorization, panelController.index, limiter);
+app.get("/panel/context/:logId", passportConfig.ensureAuthenticated, requireAuthorization, panelController.getLogContext, limiter);
+app.get("/download-logs", passportConfig.ensureAuthenticated, requireAuthorization, panelController.downloadLogs, authLimiter);
+app.get("/ticket-statistics", passportConfig.ensureAuthenticated, requireAuthorization, panelController.ticketStatistics, limiter);
 
 /**
  * Steam sign in.
