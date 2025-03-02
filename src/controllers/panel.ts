@@ -3,7 +3,8 @@ import fs from "fs";
 
 import { LogEntry } from "../types/logs";
 import { formatLogs } from "../util/logFormatter";
-import { cacheLogContext, getCachedLogContext, cacheUserRank, getCachedUserRank } from "../util/redis";
+import { cacheLogContext, getCachedLogContext } from "../util/redis";
+import { getAvailableMonths, getMonthDateRange } from "../util/dateUtils";
 
 import * as config from "../util/secrets";
 
@@ -14,38 +15,12 @@ import { database } from "../app";
  * @route GET /panel
  */
 export const index = async (req: Request, res: Response): Promise<void> => {
-    // Try to get cached rank first
-    const cachedRank = await getCachedUserRank(req.user.id);
-    let rank = cachedRank;
-
-    if (!cachedRank) {
-        // If not in cache, get from database
-        rank = await database.getRank(req.user.id);
-        // Cache the rank for future requests
-        if (rank) {
-            await cacheUserRank(req.user.id, rank);
-        }
-    }
-
-    if (!rank) {
-        res.status(403).send("You need to join the server first!");
-        return;
-    }
-
-    if (!config.ALLOWED_RANKS.includes(rank)) {
-        res.status(403).send(
-            `Your rank (${rank}) is not allowed to see this page.
-            The allowed ranks are: ${config.ALLOWED_RANKS.join(", ")}.`
-        );
-        return;
-    }
-
     const logs: LogEntry[] = await database.getLogs(req.query);
 
     res.render("panel", {
         user: req.user,
         logs: logs,
-        rank: rank
+        rank: req.user.rank
     });
 };
 
@@ -54,13 +29,6 @@ export const index = async (req: Request, res: Response): Promise<void> => {
  * @route GET /panel/context/:logId
  */
 export const getLogContext = async (req: Request, res: Response): Promise<void> => {
-    const rank = await getCachedUserRank(req.user.id) || await database.getRank(req.user.id);
-
-    if (!rank || !config.ALLOWED_RANKS.includes(rank)) {
-        res.status(403).send("Unauthorized");
-        return;
-    }
-
     const logId = parseInt(req.params.logId);
     if (isNaN(logId)) {
         res.status(400).send("Invalid log ID");
@@ -110,21 +78,6 @@ export const getLogContext = async (req: Request, res: Response): Promise<void> 
 };
 
 export const downloadLogs = async (req: Request, res: Response): Promise<void> => {
-    const rank = await getCachedUserRank(req.user.id) || await database.getRank(req.user.id);
-
-    if (!rank) {
-        res.status(403).send("You need to join the server first!");
-        return;
-    }
-
-    if (!config.ALLOWED_RANKS.includes(rank)) {
-        res.status(403).send(
-            `Your rank (${rank}) is not allowed to see this page.
-            The allowed ranks are: ${config.ALLOWED_RANKS.join(", ")}.`
-        );
-        return;
-    }
-
     const logs: LogEntry[] = await database.getLogs(req.query);
     const formattedLogs = formatLogs(logs);
 
@@ -158,5 +111,40 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
                 });
             });
         }
+    });
+};
+
+/**
+ * Ticket statistics page.
+ * @route GET /ticket-statistics
+ */
+export const ticketStatistics = async (req: Request, res: Response): Promise<void> => {
+    // Get available months (last 3 months)
+    const availableMonths = getAvailableMonths();
+    
+    // Default to current month or use selected month if valid
+    const selectedMonthYear = req.query.period ? req.query.period.toString() : `${availableMonths[0].month}-${availableMonths[0].year}`;
+    const [selectedMonth, selectedYear] = selectedMonthYear.split("-").map(num => parseInt(num));
+    
+    // Validate that the selected month/year is in the available options
+    const isValidSelection = availableMonths.some(option => 
+        option.month === selectedMonth && option.year === parseInt(selectedYear.toString()));
+    
+    // If invalid selection, default to current month
+    const month = isValidSelection ? selectedMonth : availableMonths[0].month;
+    const year = isValidSelection ? selectedYear : availableMonths[0].year;
+    
+    // Get date range for the query
+    const { startDate, endDate } = getMonthDateRange(month, year);
+    
+    // Get ticket statistics
+    const statistics = await database.getTicketStatistics(startDate, endDate);
+    
+    res.render("ticket-statistics", {
+        user: req.user,
+        rank: req.user.rank,
+        statistics: statistics,
+        selectedPeriod: `${month}-${year}`,
+        availableMonths: availableMonths
     });
 };

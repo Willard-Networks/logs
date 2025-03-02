@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include("partials/head") %>
+  <style>
+    .month-selector {
+      margin-bottom: 20px;
+    }
+    
+    .statistics-table {
+      margin-top: 20px;
+    }
+    
+    .total-row {
+      font-weight: bold;
+      background-color: #2d2d2d;
+    }
+  </style>
+</head>
+
+<body>
+  <%- include("partials/header") %>
+  <div class="container pl-sm-0 pr-sm-0 pl-lg-3 pr-lg-3">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="mt-4 mb-3">Ticket Statistics</h1>
+        
+        <div class="card bg-dark text-white">
+          <div class="card-body">
+            <form class="month-selector" method="GET" action="/ticket-statistics">
+              <div class="form-row align-items-center">
+                <div class="col-auto">
+                  <label for="period">Select Month:</label>
+                  <select class="form-control" id="period" name="period">
+                    <% availableMonths.forEach(option => { %>
+                      <option value="<%= option.month %>-<%= option.year %>" <%= selectedPeriod === `${option.month}-${option.year}` ? "selected" : "" %>><%= option.label %></option>
+                    <% }); %>
+                  </select>
+                </div>
+                <div class="col-auto">
+                  <label>&nbsp;</label>
+                  <button type="submit" class="btn btn-primary form-control">View Statistics</button>
+                </div>
+              </div>
+            </form>
+            
+            <% if (statistics && statistics.length > 0) { %>
+              <div class="table-responsive statistics-table">
+                <table class="table table-dark table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Staff Member</th>
+                      <th>Steam ID</th>
+                      <th>Tickets Claimed</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% 
+                      let totalTickets = 0;
+                      statistics.forEach((stat, index) => {
+                        totalTickets += stat.tickets;
+                    %>
+                      <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= stat.steam_name || "Unknown" %></td>
+                        <td><%= stat.steamid %></td>
+                        <td><%= stat.tickets %></td>
+                      </tr>
+                    <% }); %>
+                    <tr class="total-row">
+                      <td colspan="3">Total</td>
+                      <td><%= totalTickets %></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="alert alert-info">
+                No ticket statistics found for the selected month.
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <%- include("partials/footer") %>
+  <%- include("partials/scripts") %>
+</body>
+
+</html> 
