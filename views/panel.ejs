@@ -477,7 +477,7 @@
         
         if (filterCharID) {
           filteredBefore = filteredBefore.filter(log => 
-            log.char_id.toString().includes(filterCharID)
+            log.char_id && log.char_id.toString().includes(filterCharID)
           );
         }
         
@@ -510,7 +510,7 @@
         
         if (filterCharID) {
           filteredAfter = filteredAfter.filter(log => 
-            log.char_id.toString().includes(filterCharID)
+            log.char_id && log.char_id.toString().includes(filterCharID)
           );
         }
         
@@ -599,9 +599,10 @@
         }
         
         // Apply highlighting if search terms are provided
-        let logText = log.text;
-        let logType = log.log_type;
-        let charId = log.char_id.toString();
+        let logText = log.text || '';
+        let logType = log.log_type || '';
+        // Add null check for char_id
+        let charId = (log.char_id !== null && log.char_id !== undefined) ? log.char_id.toString() : '';
         
         if (activeFilters.length > 0) {
           logText = highlightMatch(logText, activeFilters);
