@@ -160,3 +160,96 @@ export const downloadLogs = async (req: Request, res: Response): Promise<void> =
         }
     });
 };
+
+/**
+ * Ticket statistics page.
+ * @route GET /ticket-statistics
+ */
+export const ticketStatistics = async (req: Request, res: Response): Promise<void> => {
+    // Try to get cached rank first
+    const cachedRank = await getCachedUserRank(req.user.id);
+    let rank = cachedRank;
+
+    if (!cachedRank) {
+        // If not in cache, get from database
+        rank = await database.getRank(req.user.id);
+        // Cache the rank for future requests
+        if (rank) {
+            await cacheUserRank(req.user.id, rank);
+        }
+    }
+
+    if (!rank) {
+        res.status(403).send("You need to join the server first!");
+        return;
+    }
+
+    if (!config.ALLOWED_RANKS.includes(rank)) {
+        res.status(403).send(
+            `Your rank (${rank}) is not allowed to see this page.
+            The allowed ranks are: ${config.ALLOWED_RANKS.join(", ")}.`
+        );
+        return;
+    }
+
+    // Get the current month and year
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    // Generate the last 3 months options
+    const availableMonths = [];
+    for (let i = 0; i < 3; i++) {
+        let monthIndex = currentMonth - i;
+        let yearValue = currentYear;
+        
+        if (monthIndex < 0) {
+            monthIndex += 12;
+            yearValue -= 1;
+        }
+        
+        availableMonths.push({
+            month: monthIndex + 1, // Convert to 1-based month
+            year: yearValue,
+            label: `${getMonthName(monthIndex + 1)} ${yearValue}`
+        });
+    }
+    
+    // Default to current month or use selected month if valid
+    const selectedMonthYear = req.query.period ? req.query.period.toString() : `${availableMonths[0].month}-${availableMonths[0].year}`;
+    const [selectedMonth, selectedYear] = selectedMonthYear.split('-').map(num => parseInt(num));
+    
+    // Validate that the selected month/year is in the available options
+    const isValidSelection = availableMonths.some(option => 
+        option.month === selectedMonth && option.year === parseInt(selectedYear.toString()));
+    
+    // If invalid selection, default to current month
+    const month = isValidSelection ? selectedMonth : availableMonths[0].month;
+    const year = isValidSelection ? selectedYear : availableMonths[0].year;
+    
+    // Format dates for the query
+    const startDate = `${getMonthName(month)} 1 ${year} 1:00AM`;
+    const nextMonth = month === 12 ? 1 : month + 1;
+    const nextYear = month === 12 ? year + 1 : year;
+    const endDate = `${getMonthName(nextMonth)} 1 ${nextYear} 1:00AM`;
+    
+    // Get ticket statistics
+    const statistics = await database.getTicketStatistics(startDate, endDate);
+    
+    res.render("ticket-statistics", {
+        user: req.user,
+        rank: rank,
+        statistics: statistics,
+        selectedPeriod: `${month}-${year}`,
+        availableMonths: availableMonths
+    });
+};
+
+// Helper function to get month name
+function getMonthName(month: number): string {
+    const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    return monthNames[month - 1];
+}
