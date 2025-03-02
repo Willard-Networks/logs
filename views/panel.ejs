@@ -79,6 +79,68 @@
     .log-row:hover {
       background-color: #2d2d2d !important;
     }
+    
+    /* Styles for the filter container */
+    .filter-container {
+      background-color: #1a1a1a;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+      margin-bottom: 15px;
+    }
+    
+    .filter-container .input-group-text {
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+    
+    .filter-container .form-control {
+      background-color: #333;
+      color: #fff;
+      border: 1px solid #444;
+    }
+    
+    .filter-container .form-control:focus {
+      background-color: #444;
+      color: #fff;
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .filter-container .btn-clear {
+      background-color: #555;
+      color: white;
+      border: none;
+    }
+    
+    .filter-container .btn-clear:hover {
+      background-color: #777;
+    }
+    
+    /* Highlight matching text in filtered results */
+    .highlight {
+      background-color: #ffff00;
+      color: #000;
+      padding: 2px;
+      border-radius: 2px;
+    }
+    
+    /* Style for the "Show Only Selected User's Logs" button when active */
+    #showOnlySelectedUserBtn.active {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    
+    /* Make the checkbox more visible */
+    .form-check-input {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .form-check-label {
+      padding-left: 5px;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -206,6 +268,64 @@
   <div id="contextModal" class="context-modal">
     <div class="context-modal-content">
       <span class="close-modal">&times;</span>
+      
+      <!-- Add filter inputs -->
+      <div class="filter-container mb-3">
+        <div class="row mb-2">
+          <div class="col-md-4">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Log Type:</span>
+              </div>
+              <input type="text" id="filterLogType" class="form-control" placeholder="Filter by log type...">
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Message:</span>
+              </div>
+              <input type="text" id="filterText" class="form-control" placeholder="Filter by message content...">
+            </div>
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-4">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Steam ID:</span>
+              </div>
+              <input type="text" id="filterSteamID" class="form-control" placeholder="Filter by Steam ID...">
+              <div class="input-group-append">
+                <button class="btn btn-info" id="useTargetSteamID" type="button" title="Use selected user's Steam ID">
+                  <i class="fas fa-user"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Character ID:</span>
+              </div>
+              <input type="text" id="filterCharID" class="form-control" placeholder="Filter by character ID...">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex align-items-center">
+              <button id="showOnlySelectedUserBtn" class="btn btn-primary" type="button">
+                Show Only Selected User's Logs
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <button class="btn btn-clear" id="clearAllFilters" type="button">Clear All Filters</button>
+          </div>
+        </div>
+      </div>
+      
       <div id="beforeContext" class="context-section">
         <h3>Before</h3>
         <div class="content"></div>
@@ -244,8 +364,183 @@
         setTimeout(updateDownloadUrl, 100); // Small delay to ensure URL is updated
       });
 
-      // Format log data for display
-      function formatLogRow(log) {
+      // Store the original context data for filtering
+      let originalContextData = {
+        before: [],
+        target: null,
+        after: []
+      };
+
+      // Handle filter inputs
+      $('#filterLogType, #filterText, #filterSteamID, #filterCharID').on('input', function() {
+        applyFilters();
+      });
+      
+      // Track if we're showing only the selected user's logs
+      let showingOnlySelectedUser = false;
+      
+      // Handle clear all filters button
+      $('#clearAllFilters').on('click', function() {
+        $('#filterLogType, #filterText, #filterSteamID, #filterCharID').val('');
+        showingOnlySelectedUser = false;
+        $('#showOnlySelectedUserBtn').text('Show Only Selected User\'s Logs').removeClass('active');
+        applyFilters();
+      });
+      
+      // Handle "Use selected user's Steam ID" button
+      $('#useTargetSteamID').on('click', function() {
+        if (originalContextData.target && originalContextData.target.steamid) {
+          // Don't use SERVER steamids (those starting with 9)
+          if (originalContextData.target.steamid.substring(0, 1) !== '9') {
+            $('#filterSteamID').val(originalContextData.target.steamid);
+            applyFilters();
+          } else {
+            // If it's a SERVER steamid, show a message or clear the field
+            $('#filterSteamID').val('');
+            alert('The selected log is from the SERVER, not a user.');
+          }
+        }
+      });
+      
+      // Handle "Show Only Selected User's Logs" button
+      $('#showOnlySelectedUserBtn').on('click', function() {
+        // Clear other filters first
+        $('#filterLogType, #filterText, #filterSteamID, #filterCharID').val('');
+        
+        // Toggle the state
+        showingOnlySelectedUser = !showingOnlySelectedUser;
+        
+        // Apply filters
+        applyFilters();
+      });
+      
+      // Function to apply all filters
+      function applyFilters() {
+        if (!originalContextData.target) return; // No data to filter
+        
+        const filterLogType = $('#filterLogType').val().toLowerCase();
+        const filterText = $('#filterText').val().toLowerCase();
+        const filterSteamID = $('#filterSteamID').val();
+        const filterCharID = $('#filterCharID').val();
+        
+        // Get target user's SteamID for the filter
+        const targetSteamID = originalContextData.target.steamid;
+        
+        // Update UI to show which user we're filtering for
+        if (showingOnlySelectedUser && targetSteamID) {
+          if (targetSteamID.substring(0, 1) !== '9') { // Not SERVER
+            $('#showOnlySelectedUserBtn').text(`Showing Only: ${targetSteamID}`).addClass('active');
+          } else {
+            $('#showOnlySelectedUserBtn').text('Showing Only: SERVER').addClass('active');
+          }
+        } else {
+          $('#showOnlySelectedUserBtn').text('Show Only Selected User\'s Logs').removeClass('active');
+        }
+        
+        // Filter the before logs
+        let filteredBefore = originalContextData.before;
+        
+        // Apply SteamID filter if button is active
+        if (showingOnlySelectedUser && targetSteamID) {
+          filteredBefore = filteredBefore.filter(log => log.steamid === targetSteamID);
+        }
+        
+        // Apply text filters
+        if (filterLogType) {
+          filteredBefore = filteredBefore.filter(log => 
+            log.log_type.toLowerCase().includes(filterLogType)
+          );
+        }
+        
+        if (filterText) {
+          filteredBefore = filteredBefore.filter(log => 
+            log.text.toLowerCase().includes(filterText)
+          );
+        }
+        
+        if (filterSteamID) {
+          filteredBefore = filteredBefore.filter(log => 
+            log.steamid && log.steamid.includes(filterSteamID)
+          );
+        }
+        
+        if (filterCharID) {
+          filteredBefore = filteredBefore.filter(log => 
+            log.char_id && log.char_id.toString().includes(filterCharID)
+          );
+        }
+        
+        // Filter the after logs with the same logic
+        let filteredAfter = originalContextData.after;
+        
+        // Apply SteamID filter if button is active
+        if (showingOnlySelectedUser && targetSteamID) {
+          filteredAfter = filteredAfter.filter(log => log.steamid === targetSteamID);
+        }
+        
+        // Apply text filters
+        if (filterLogType) {
+          filteredAfter = filteredAfter.filter(log => 
+            log.log_type.toLowerCase().includes(filterLogType)
+          );
+        }
+        
+        if (filterText) {
+          filteredAfter = filteredAfter.filter(log => 
+            log.text.toLowerCase().includes(filterText)
+          );
+        }
+        
+        if (filterSteamID) {
+          filteredAfter = filteredAfter.filter(log => 
+            log.steamid && log.steamid.includes(filterSteamID)
+          );
+        }
+        
+        if (filterCharID) {
+          filteredAfter = filteredAfter.filter(log => 
+            log.char_id && log.char_id.toString().includes(filterCharID)
+          );
+        }
+        
+        // Collect all active filters for highlighting
+        const activeFilters = [];
+        if (filterLogType) activeFilters.push(filterLogType);
+        if (filterText) activeFilters.push(filterText);
+        if (filterSteamID) activeFilters.push(filterSteamID);
+        if (filterCharID) activeFilters.push(filterCharID);
+        
+        // Clear previous content
+        $('#beforeContext .content').empty();
+        $('#targetContext .content').empty();
+        $('#afterContext .content').empty();
+
+        // Create tables for each section
+        const beforeTable = $('<table class="table table-dark table-striped">').appendTo('#beforeContext .content');
+        const targetTable = $('<table class="table table-dark table-striped">').appendTo('#targetContext .content');
+        const afterTable = $('<table class="table table-dark table-striped">').appendTo('#afterContext .content');
+
+        // Add content
+        filteredBefore.forEach(log => {
+          beforeTable.append(formatLogRow(log, activeFilters));
+        });
+        
+        if (originalContextData.target) {
+          // Always show the target log, but still highlight matches
+          targetTable.append(formatLogRow(originalContextData.target, activeFilters));
+        }
+        
+        filteredAfter.forEach(log => {
+          afterTable.append(formatLogRow(log, activeFilters));
+        });
+        
+        // Update counts
+        $('#beforeContext h3').text(`Before (${filteredBefore.length})`);
+        $('#afterContext h3').text(`After (${filteredAfter.length})`);
+      }
+
+      // Format log data for display with optional highlighting
+      function formatLogRow(log, activeFilters = []) {
         let steamidDisplay = log.steamid;
         if (log.steamid) {
           if (log.steamid.substring(0, 1) === '9') {
@@ -276,15 +571,50 @@
 
           return `${month} ${date}, ${year} ${hour}:${min}:${sec} ${isAfternoon ? 'PM' : 'AM'}`;
         }
+        
+        // Function to highlight matching text
+        function highlightMatch(text, searchTerms) {
+          if (!searchTerms || !searchTerms.length || typeof text !== 'string') return text;
+          
+          let result = text;
+          searchTerms.forEach(term => {
+            if (term && term.length > 0) {
+              const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+              result = result.replace(regex, '<span class="highlight">$1</span>');
+            }
+          });
+          
+          return result;
+        }
+        
+        // Apply highlighting if search terms are provided
+        let logText = log.text || '';
+        let logType = log.log_type || '';
+        // Add null check for char_id
+        let charId = (log.char_id !== null && log.char_id !== undefined) ? log.char_id.toString() : '';
+        
+        if (activeFilters.length > 0) {
+          logText = highlightMatch(logText, activeFilters);
+          logType = highlightMatch(logType, activeFilters);
+          charId = highlightMatch(charId, activeFilters);
+          
+          // Highlight steamid if it's not SERVER
+          if (log.steamid && log.steamid.substring(0, 1) !== '9') {
+            const highlightedSteamId = highlightMatch(log.steamid, activeFilters);
+            if (highlightedSteamId !== log.steamid) {
+              steamidDisplay = `<a class="text-white" href="https://steamid.io/lookup/${log.steamid}">${highlightedSteamId}</a>`;
+            }
+          }
+        }
 
         return `
           <tr>
             <td>${log.id}</td>
-            <td>${log.log_type}</td>
-            <td>${log.text}</td>
+            <td>${logType}</td>
+            <td>${logText}</td>
             <td>${timeConverter(log.datetime)}</td>
             <td>${steamidDisplay}</td>
-            <td>${log.char_id}</td>
+            <td>${charId}</td>
           </tr>
         `;
       }
@@ -293,29 +623,21 @@
       $('.log-row').click(function() {
         const logId = $(this).data('log-id');
         
+        // Clear all filters
+        $('#filterLogType, #filterText, #filterSteamID, #filterCharID').val('');
+        showingOnlySelectedUser = false;
+        $('#showOnlySelectedUserBtn').text('Show Only Selected User\'s Logs').removeClass('active');
+        
         // Fetch context logs
         fetch(`/panel/context/${logId}`)
           .then(response => response.json())
           .then(data => {
-            // Clear previous content
-            $('#beforeContext .content').empty();
-            $('#targetContext .content').empty();
-            $('#afterContext .content').empty();
-
-            // Create tables for each section
-            const beforeTable = $('<table class="table table-dark table-striped">').appendTo('#beforeContext .content');
-            const targetTable = $('<table class="table table-dark table-striped">').appendTo('#targetContext .content');
-            const afterTable = $('<table class="table table-dark table-striped">').appendTo('#afterContext .content');
-
-            // Add content
-            data.before.forEach(log => {
-              beforeTable.append(formatLogRow(log));
-            });
-            targetTable.append(formatLogRow(data.target));
-            data.after.forEach(log => {
-              afterTable.append(formatLogRow(log));
-            });
-
+            // Store the original data for filtering
+            originalContextData = data;
+            
+            // Display the logs without filtering
+            applyFilters();
+            
             // Show modal
             modal.style.display = 'block';
           })
