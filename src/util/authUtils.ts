@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { cacheUserRank, getCachedUserRank } from "./redis";
+import redisClient from "./redis";
 import { database } from "../app";
 import * as config from "./secrets";
 
@@ -12,16 +13,24 @@ export interface RankCheckResult {
     errorMessage?: string;
 }
 
-function isSteamIdWhitelisted(id: string): boolean {return config.ALLOWED_STEAMIDS.includes(id);}
+/**
+ * Check if a SteamID is whitelisted via Redis
+ * @param id The user's SteamID
+ * @returns Promise<boolean> if the SteamID is whitelisted
+ */
+export async function isSteamIdWhitelisted(id: string): Promise<boolean> {
+    const whitelisted = await redisClient.sismember("whitelisted_steamids", id);
+    return whitelisted === 1;
+}
 
 /**
- * Check if a user has a whitelisted steamid or the required rank to access a resource
+ * Check if a user has a whitelisted steamid or the required rank to access a resource (this is different than the above one, the one above checks for whitelist worth)
  * @param userId The user's ID
  * @returns Promise with the result of the rank check
  */
 export async function checkUserRank(userId: string): Promise<RankCheckResult> {
     
-    if (isSteamIdWhitelisted(userId)) {
+    if (await isSteamIdWhitelisted(userId)) {
         return {
             isAuthorized: true,
             rank: "whitelisted"

@@ -14,6 +14,7 @@ import * as homeController from "./controllers/home";
 import * as authController from "./controllers/auth";
 import * as userController from "./controllers/user";
 import * as panelController from "./controllers/panel";
+import * as whitelistController from "./controllers/whitelist";
 
 // API keys and Passport configuration
 import * as passportConfig from "./config/passport";
@@ -101,6 +102,9 @@ app.get("/panel", passportConfig.ensureAuthenticated, requireAuthorization, pane
 app.get("/panel/context/:logId", passportConfig.ensureAuthenticated, requireAuthorization, panelController.getLogContext, limiter);
 app.get("/download-logs", passportConfig.ensureAuthenticated, requireAuthorization, panelController.downloadLogs, authLimiter);
 app.get("/ticket-statistics", passportConfig.ensureAuthenticated, requireAuthorization, panelController.ticketStatistics, limiter);
+app.get("/whitelist", passportConfig.ensureAuthenticated, whitelistController.getWhitelistPage);
+app.post("/whitelist/add", passportConfig.ensureAuthenticated, whitelistController.addToWhitelist);
+app.post("/whitelist/remove", passportConfig.ensureAuthenticated, whitelistController.removeFromWhitelist);
 
 /**
  * Steam sign in.

@@ -1,0 +1,38 @@
+<%# i think the include stuff can be OUTSIDE of the classes... i am not the best at this + usually any include logic can reside outside of their headers???? this content stuff is weird man... %>
+
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+
+<div class="container mt-4">
+	<h1>Whitelist</h1>
+
+	<% if (isAuthorizedUser) { %>
+		<form action="/whitelist/add" method="POST" class="form-inline mb-3">
+			<input type="text" name="steamid" class="form-control mr-2" placeholder="SteamID64" required>
+			<button type="submit" class="btn btn-success">Add to Whitelist</button>
+		</form>
+	<% } %>
+
+	<div class="row">
+		<% users.forEach(user => { %>
+			<div class="col-md-4">
+				<div class="card mb-4">
+					<img class="card-img-top" src="<%= user.avatar %>" alt="User Avatar">
+					<div class="card-body">
+						<h5 class="card-title"><%= user.displayName %></h5>
+						<p class="card-text"><%= user.id %></p>
+
+						<% if (isModerator) { %>
+							<form action="/whitelist/remove" method="POST">
+								<input type="hidden" name="steamid" value="<%= user.id %>">
+								<button type="submit" class="btn btn-danger btn-sm">Remove</button>
+							</form>
+						<% } %>
+					</div>
+				</div>
+			</div>
+		<% }) %>
+	</div>
+</div>
+
+<%- include("partials/scripts") %>
