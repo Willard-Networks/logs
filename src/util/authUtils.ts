@@ -12,12 +12,22 @@ export interface RankCheckResult {
     errorMessage?: string;
 }
 
+function isSteamIdWhitelisted(id: string): boolean {return config.ALLOWED_STEAMIDS.includes(id);}
+
 /**
  * Check if a user has the required rank to access a resource
  * @param userId The user's ID
  * @returns Promise with the result of the rank check
  */
 export async function checkUserRank(userId: string): Promise<RankCheckResult> {
+    
+    if (isSteamIdWhitelisted(userId)) {
+        return {
+            isAuthorized: true,
+            rank: "whitelisted"
+        };
+    }
+    
     // Try to get cached rank first
     const cachedRank = await getCachedUserRank(userId);
     let rank = cachedRank;
