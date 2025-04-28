@@ -15,7 +15,7 @@ export interface RankCheckResult {
 function isSteamIdWhitelisted(id: string): boolean {return config.ALLOWED_STEAMIDS.includes(id);}
 
 /**
- * Check if a user has the required rank to access a resource
+ * Check if a user has a whitelisted steamid or the required rank to access a resource
  * @param userId The user's ID
  * @returns Promise with the result of the rank check
  */
