@@ -29,6 +29,7 @@ services:
       - ADMIN_MOD=${ADMIN_MOD}
       - STEAM_KEY=${STEAM_KEY}
       - ALLOWED_RANKS=${ALLOWED_RANKS}
+      - ALLOWED_STEAMIDS=${ALLOWED_STEAMIDS}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     hostname: logs.willard.local
