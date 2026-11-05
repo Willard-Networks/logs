@@ -88,7 +88,7 @@ docker compose ps
 docker compose logs --tail=100 willard-logs
 ```
 
-The Node 22 Bookworm and Redis 8 Bookworm images are digest-pinned. Weekly
+The Node 22 Bookworm and Redis 8 Alpine images are digest-pinned. Weekly
 Dependabot PRs cover the Dockerfile, Compose images, npm dependencies and GitHub
 Actions separately. Review release notes and CI before merging an update; a
 `docker compose pull` alone does not update a digest pin or rebuild the app.
@@ -99,12 +99,11 @@ It does not test Steam login or queries against the production MySQL database.
 
 Before changing Redis versions, back up `redis-data` and check the existing
 server version (`docker compose exec redis redis-cli INFO server`). Redis 8
-uses the official Debian Bookworm image, not Alpine. CI verifies both runtime
-containers are Debian-based and do not ship an SSH daemon. This avoids relying
-on an Alpine image rebuild after the [OpenSSH advisory](https://alpinelinux.org/posts/2026-11-05-openssh-password-authentication-bypass/).
-The previous Alpine image did not install OpenSSH and was not affected by that
-specific issue; an Alpine deployment host running SSH must still be patched
-separately. Keep the Redis major compatible with the existing data volume. Check the release-specific upgrade path
+uses the official Alpine image. CI reports its Alpine release and verifies that
+neither runtime container ships an SSH daemon. The [OpenSSH advisory](https://alpinelinux.org/posts/2026-11-05-openssh-password-authentication-bypass/)
+does not affect containers without sshd; an Alpine deployment host running SSH
+must still be patched separately. Check the actual installed packages and
+release, rather than assuming a recently pulled image contains every fix. Keep the Redis major compatible with the existing data volume. Check the release-specific upgrade path
 if the running server is older. Never roll persisted Redis data back to an
 older incompatible server binary; restore a compatible backup instead. Keep the previous Git
 revision and image available for rollback; do not run `docker compose down -v`
