@@ -1,5 +1,3 @@
-version: "3.8"
-
 networks:
   logs-network:
     driver: bridge
@@ -7,8 +5,10 @@ networks:
 services:
   willard-logs:
     container_name: willard-logs
+    init: true
+    restart: always
     ports:
-      - "3335:3335"
+      - "${PORT:-3335}:${PORT:-3335}"
     build:
       context: .
       dockerfile: ./docker/Dockerfile
@@ -16,7 +16,7 @@ services:
       - NODE_ENV=${NODE_ENV}
       - SESSION_SECRET=${SESSION_SECRET}
       - WEBSITE_DOMAIN=${WEBSITE_DOMAIN}
-      - PORT=${PORT}
+      - PORT=${PORT:-3335}
       - SSL=${SSL}
       - SSL_CERT=${SSL_CERT}
       - SSL_KEY=${SSL_KEY}
@@ -24,8 +24,9 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASS=${MYSQL_PASS}
       - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
       - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_SAM_DB=${MYSQL_SAM_DB}
       - ADMIN_MOD=${ADMIN_MOD}
       - STEAM_KEY=${STEAM_KEY}
       - ALLOWED_RANKS=${ALLOWED_RANKS}
@@ -35,22 +36,27 @@ services:
     networks:
       - logs-network
     healthcheck:
-      test: ["CMD", "curl", "http://logs.willard.local:3335"]
+      test: ["CMD", "node", "docker/healthcheck.cjs"]
       interval: 60s
       timeout: 10s
       retries: 3
       start_period: 10s
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
 
   redis:
-    image: redis:alpine
+    image: redis:8-alpine@sha256:21090af93f8324db2f0f0f4f38a7c60369d47d917e000c3423d89d2ae2883537
     container_name: willard-logs-redis
-    ports:
-      - "6379:6379"
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - redis-data:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     networks:
       - logs-network

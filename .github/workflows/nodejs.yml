@@ -1,55 +1,75 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [main]
+  # Also check stacked maintenance PRs before their base branch reaches main.
   pull_request:
-    branches: [main]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  test:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+jobs:
+  test:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x, 21.x]
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+        node-version: [22.x, 24.x]
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Use node.js
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --runInBand
+      - run: npm run build
+      - run: node --test docker/healthcheck.test.cjs
 
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: install and test
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NODE_ENV: production
+      SESSION_SECRET: ci-only-not-a-production-secret
+      WEBSITE_DOMAIN: localhost
+      PORT: 3335
+      SSL: 'false'
+      DATABASE: mysql
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+      MYSQL_USER: ci
+      MYSQL_PASS: ci
+      MYSQL_DB: ci
+      MYSQL_SAM_DB: ci
+      ADMIN_MOD: sam
+      STEAM_KEY: ci-placeholder
+      ALLOWED_RANKS: admin
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose and build the production image
         run: |
-          npm ci
-          npm run test
-          npm run build --if-present
+          docker compose config --quiet
+          docker compose build --pull
+      - name: Start containers and check the actual image
+        run: |
+          docker compose up -d --wait --wait-timeout 120
+          docker compose exec -T willard-logs node docker/healthcheck.cjs
+          docker compose exec -T willard-logs node -e "if (process.getuid() === 0) process.exit(1)"
+          docker compose exec -T willard-logs node -e "require('node:fs').accessSync('.', require('node:fs').constants.W_OK)"
+          docker compose exec -T willard-logs node -e "if (require('./package.json').dependencies.sqlite3) require('sqlite3')"
+          docker compose exec -T redis redis-cli ping | grep -x PONG
+          docker compose exec -T willard-logs sh -ec '. /etc/os-release; test "$ID" = debian'
+          docker compose exec -T redis sh -ec '. /etc/os-release; test "$ID" = alpine; cat /etc/alpine-release; if apk info -e openssh-server || apk info -e openssh-server-pam; then exit 1; fi'
+          for service in willard-logs redis; do
+            docker compose exec -T "$service" sh -ec 'test ! -e /usr/sbin/sshd'
+            test "$(docker inspect --format '{{.HostConfig.RestartPolicy.Name}}' "$(docker compose ps -q "$service")")" = always
+          done
+          curl --fail http://localhost:3335/ > /dev/null
+      - name: Container logs
+        if: always()
+        run: docker compose logs --no-color
+      - name: Clean up
+        if: always()
+        run: docker compose down --volumes
