@@ -88,7 +88,8 @@ Dependabot PRs cover the Dockerfile, Compose images, npm dependencies and GitHub
 Actions separately. Review release notes and CI before merging an update; a
 `docker compose pull` alone does not update a digest pin or rebuild the app.
 CI builds the production image, starts it with Redis, checks HTTP liveness,
-non-root execution and the SQLite native module, then removes its test volumes.
+non-root execution, a writable log directory and SQLite native loading when
+SQLite is installed, then removes its test volumes.
 It does not test Steam login or queries against the production MySQL database.
 
 Before changing Redis versions, back up `redis-data` and check the existing

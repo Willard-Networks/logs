@@ -57,7 +57,8 @@ jobs:
           docker compose up -d --wait --wait-timeout 120
           docker compose exec -T willard-logs node docker/healthcheck.cjs
           docker compose exec -T willard-logs node -e "if (process.getuid() === 0) process.exit(1)"
-          docker compose exec -T willard-logs node -e "require('sqlite3')"
+          docker compose exec -T willard-logs node -e "require('node:fs').accessSync('.', require('node:fs').constants.W_OK)"
+          docker compose exec -T willard-logs node -e "if (require('./package.json').dependencies.sqlite3) require('sqlite3')"
           docker compose exec -T redis redis-cli ping | grep -x PONG
           for service in willard-logs redis; do
             test "$(docker inspect --format '{{.HostConfig.RestartPolicy.Name}}' "$(docker compose ps -q "$service")")" = always

@@ -19,6 +19,8 @@ COPY --from=build --chown=node:node /logs/node_modules ./node_modules
 COPY --from=build --chown=node:node /logs/dist ./dist
 COPY --from=build --chown=node:node /logs/views ./views
 COPY --chown=node:node docker/healthcheck.cjs ./docker/healthcheck.cjs
+# Winston creates debug.log in the working directory.
+RUN chown node:node /logs
 USER node
 HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
     CMD ["node", "docker/healthcheck.cjs"]
