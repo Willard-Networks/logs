@@ -1,0 +1,17 @@
+[Unit]
+Description=Willard logs Compose stack
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/willard-logs
+ExecStart=/usr/bin/docker compose up -d --wait --wait-timeout 120
+ExecStop=/usr/bin/docker compose stop
+TimeoutStartSec=180
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

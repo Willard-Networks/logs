@@ -1,5 +1,11 @@
-/node_modules/
+node_modules
 .git
-.gitignore
-/build/
-README.node_modules
+.env
+.env.*
+*.pem
+*.key
+*.crt
+dist
+build
+coverage
+npm-debug.log*

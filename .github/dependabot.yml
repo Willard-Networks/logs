@@ -1,9 +1,38 @@
 version: 2
 updates:
-  - package-ecosystem: npm #set the package ecosystem to npm
-    directory: / #looking in the root dir for the file
+  - package-ecosystem: npm
+    directory: /
     schedule:
-      interval: weekly #checking weekly for updates
-      day: friday #checking on friday
-    assignees: #assignes people to maintain the PR
+      interval: weekly
+      day: friday
+    assignees:
+      - VottonDev
+    groups:
+      compatible-dependencies:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: docker
+    directory: /docker
+    schedule:
+      interval: weekly
+      day: friday
+    assignees:
+      - VottonDev
+
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: friday
+    assignees:
+      - VottonDev
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: friday
+    assignees:
       - VottonDev
