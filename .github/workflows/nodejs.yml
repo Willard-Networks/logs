@@ -60,8 +60,10 @@ jobs:
           docker compose exec -T willard-logs node -e "require('node:fs').accessSync('.', require('node:fs').constants.W_OK)"
           docker compose exec -T willard-logs node -e "if (require('./package.json').dependencies.sqlite3) require('sqlite3')"
           docker compose exec -T redis redis-cli ping | grep -x PONG
+          docker compose exec -T willard-logs sh -ec '. /etc/os-release; test "$ID" = debian'
+          docker compose exec -T redis sh -ec '. /etc/os-release; test "$ID" = alpine; cat /etc/alpine-release; if apk info -e openssh-server || apk info -e openssh-server-pam; then exit 1; fi'
           for service in willard-logs redis; do
-            docker compose exec -T "$service" sh -ec '. /etc/os-release; test "$ID" = debian; test ! -e /usr/sbin/sshd'
+            docker compose exec -T "$service" sh -ec 'test ! -e /usr/sbin/sshd'
             test "$(docker inspect --format '{{.HostConfig.RestartPolicy.Name}}' "$(docker compose ps -q "$service")")" = always
           done
           curl --fail http://localhost:3335/ > /dev/null
