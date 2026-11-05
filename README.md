@@ -6,7 +6,7 @@ A logger for the Helix roleplaying framework written in Node.js with Typescript.
 # Features
 - Steam login
 - Usergroup whitelist
-- MySQL and SQLite support
+- MySQL support
 - SAM, Serverguard and ULX support
 - Search filters
   - Messages
@@ -36,6 +36,11 @@ git clone --depth=1 https://github.com/willardnetworks/logs.git <project_name>
 cd <project_name>
 npm ci
 ```
+
+Use npm with the committed `package-lock.json`; do not generate a separate pnpm
+or Yarn lockfile. The app supports MySQL; unused SQLite dependencies have been
+removed rather than carrying their native installer into production.
+
 - Configuration
 
 Rename the `.env.example` file to `.env` and fill out the environment variables
