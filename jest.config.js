@@ -1,5 +1,4 @@
 module.exports = {
-    setupFilesAfterEnv: ["<rootDir>/test/setup.ts"],
     moduleFileExtensions: [
         "ts",
         "js"
