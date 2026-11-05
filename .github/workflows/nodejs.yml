@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+  # Also check stacked maintenance PRs before their base branch reaches main.
   pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -61,6 +61,7 @@ jobs:
           docker compose exec -T willard-logs node -e "if (require('./package.json').dependencies.sqlite3) require('sqlite3')"
           docker compose exec -T redis redis-cli ping | grep -x PONG
           for service in willard-logs redis; do
+            docker compose exec -T "$service" sh -ec '. /etc/os-release; test "$ID" = debian; test ! -e /usr/sbin/sshd'
             test "$(docker inspect --format '{{.HostConfig.RestartPolicy.Name}}' "$(docker compose ps -q "$service")")" = always
           done
           curl --fail http://localhost:3335/ > /dev/null
