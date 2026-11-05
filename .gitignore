@@ -39,8 +39,9 @@ Thumbs.db
 # Ignore built ts files
 dist/**/*
 
-# ignore yarn.lock
+# npm/package-lock.json is canonical; do not maintain competing lockfiles.
 yarn.lock
+pnpm-lock.yaml
 
 #vscode
 .vscode
