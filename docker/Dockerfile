@@ -1,5 +1,5 @@
 # Keep the build and native runtime dependencies on the same Node/Debian image.
-FROM node:22-bookworm-slim@sha256:5ec23b7c622b00547753bc6ffd78085dd868a68aeb41c8e0a1418f033e13d96d AS build
+FROM node:26-bookworm-slim@sha256:5df79989ed685e09f0a98019db4cebfb22fb9df1a53c0161664a011f7ff6b0f1 AS build
 
 WORKDIR /logs
 COPY package.json package-lock.json ./
@@ -11,7 +11,7 @@ RUN npm ci
 COPY . .
 RUN npm run build && npm prune --omit=dev
 
-FROM node:22-bookworm-slim@sha256:5ec23b7c622b00547753bc6ffd78085dd868a68aeb41c8e0a1418f033e13d96d AS runtime
+FROM node:26-bookworm-slim@sha256:5df79989ed685e09f0a98019db4cebfb22fb9df1a53c0161664a011f7ff6b0f1 AS runtime
 ENV NODE_ENV=production
 WORKDIR /logs
 COPY --from=build --chown=node:node /logs/package.json /logs/package-lock.json ./
