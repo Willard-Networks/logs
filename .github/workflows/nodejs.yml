@@ -67,6 +67,12 @@ jobs:
             test "$(docker inspect --format '{{.HostConfig.RestartPolicy.Name}}' "$(docker compose ps -q "$service")")" = always
           done
           curl --fail http://localhost:3335/ > /dev/null
+      - name: Check Redis persistence after restart
+        run: |
+          docker compose exec -T redis redis-cli SET ci:persistence survives-restart | grep -x OK
+          docker compose restart --timeout 10 redis
+          docker compose up --no-recreate -d --wait --wait-timeout 120 redis
+          docker compose exec -T redis redis-cli GET ci:persistence | grep -x survives-restart
       - name: Container logs
         if: always()
         run: docker compose logs --no-color
